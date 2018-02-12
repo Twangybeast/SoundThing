@@ -4,38 +4,44 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="twangybeast.myapplication.MainActivity">
+    tools:context="twangybeast.myapplication.RecordSoundNoteActivity">
 
     <Button
-        android:id="@+id/buttonStartSoundNote"
+        android:id="@+id/buttonRecordSound"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         android:layout_marginTop="16dp"
-        android:onClick="onStartSoundNoteClick"
-        android:text="@string/button_start_sound_file"
+        android:onClick="toggleRecord"
+        android:text="@string/button_start_record"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.499" />
 
-    <Button
-        android:id="@+id/buttonStartTextNote"
+    <TextView
+        android:id="@+id/textSoundLength"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/buttonStartSoundNote"
-        android:layout_centerHorizontal="true"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_weight="1"
-        android:onClick="onStartTextNoteClick"
-        android:text="@string/button_start_text_file"
+        android:text="00:00"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/buttonStartSoundNote" />
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@+id/button4" />
 
+    <Button
+        android:id="@+id/button4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:onClick="doneRecord"
+        android:text="@string/button_done_record"
+        app:layout_constraintTop_toBottomOf="@+id/buttonRecordSound"
+        tools:layout_editor_absoluteX="161dp" />
 </android.support.constraint.ConstraintLayout>
