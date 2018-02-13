@@ -43,5 +43,8 @@
         android:onClick="doneRecord"
         android:text="@string/button_done_record"
         app:layout_constraintTop_toBottomOf="@+id/buttonRecordSound"
-        tools:layout_editor_absoluteX="161dp" />
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toRightOf="parent" />
 </android.support.constraint.ConstraintLayout>

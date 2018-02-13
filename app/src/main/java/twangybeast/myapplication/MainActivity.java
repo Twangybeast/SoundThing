@@ -32,11 +32,11 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class MainActivity extends AppCompatActivity{
-    public static final int REQUEST_SOUND_FILE = 149587149;
+    public static final int REQUEST_SOUND_FILE = 0b110110010110101;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_sound_display);
+        setContentView(R.layout.activity_main);
     }
     public void onStartSoundNoteClick(View view)
     {
@@ -51,7 +51,8 @@ public class MainActivity extends AppCompatActivity{
             case REQUEST_SOUND_FILE:
                 if (resultCode == RESULT_OK)
                 {
-                    
+                    data.setClass(this, NoteEditActivity.class);
+                    startActivity(data);
                 }
                 break;
         }
