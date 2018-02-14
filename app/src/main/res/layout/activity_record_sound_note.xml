@@ -6,6 +6,27 @@
     android:layout_height="match_parent"
     tools:context="twangybeast.myapplication.RecordSoundNoteActivity">
 
+    <twangybeast.myapplication.WaveformView
+        android:id="@+id/WaveView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginLeft="0dp"
+        android:layout_marginRight="0dp"
+        android:layout_marginTop="0dp"
+        android:background="#ccc"
+        android:paddingBottom="40dp"
+        android:paddingLeft="20dp"
+        app:exampleColor="#33b5e5"
+        app:exampleDimension="24sp"
+        app:exampleDrawable="@android:drawable/ic_menu_add"
+        app:exampleString="Hello, WaveformView"
+        app:layout_constraintBottom_toTopOf="@+id/buttonRecordSound"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintVertical_bias="0.0" />
     <Button
         android:id="@+id/buttonRecordSound"
         android:layout_width="wrap_content"
@@ -47,4 +68,5 @@
         app:layout_constraintLeft_toLeftOf="parent"
         android:layout_marginRight="8dp"
         app:layout_constraintRight_toRightOf="parent" />
+
 </android.support.constraint.ConstraintLayout>

@@ -7,6 +7,7 @@ import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.SurfaceHolder;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -16,7 +17,7 @@ import org.w3c.dom.Text;
 import java.io.BufferedOutputStream;
 import java.io.File;
 
-public class RecordSoundNoteActivity extends AppCompatActivity {
+public class RecordSoundNoteActivity extends AppCompatActivity{
     File file;
     public static final String FILE_PREFIX = "voiceRecording";
     public static final String FILE_SUFFIX = ".wav";
@@ -32,6 +33,7 @@ public class RecordSoundNoteActivity extends AppCompatActivity {
     long totalRead = 0;
     int currentTime = 0;
     TextView time;
+    WaveformView waveView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,6 +43,7 @@ public class RecordSoundNoteActivity extends AppCompatActivity {
         bufferSize = AudioRecord.getMinBufferSize(SAMPLE_RATE, CHANNEL, ENCODING);
         bufferSize = Math.max(4096, bufferSize);
         time = findViewById(R.id.textSoundLength);
+        waveView = findViewById(R.id.WaveView);
     }
     public void chooseSoundFile()
     {
@@ -63,7 +66,7 @@ public class RecordSoundNoteActivity extends AppCompatActivity {
     }
     public void processBytes(short[] data, int amount)
     {
-
+        waveView.updateAudioData(data, true);
     }
     public void processTime(int amountRead)
     {
