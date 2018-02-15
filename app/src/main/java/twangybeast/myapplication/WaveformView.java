@@ -8,6 +8,7 @@ import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.text.TextPaint;
 import android.util.AttributeSet;
+import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 
@@ -17,12 +18,11 @@ import java.util.Queue;
 /**
  * TODO: document your custom view class.
  */
-public class WaveformView extends SurfaceView {
+public class WaveformView extends SurfaceView implements SurfaceHolder.Callback{
 
-    Queue<short[]> rawHistory;
+    Queue<float[]> rawHistory;
     float[] fourier;
     public static final int MAX_HISTORY = 20;
-    public static final int MAX_AMPLITUDE = 1 << 15 - 1;
 
     public WaveformView(Context context) {
         super(context);
@@ -40,12 +40,14 @@ public class WaveformView extends SurfaceView {
     }
 
     public void init() {
+        setZOrderOnTop(true);
         rawHistory = new LinkedList<>();
         fourier = null;
+        getHolder().addCallback(this);
     }
 
-    public synchronized void updateAudioData(short[] buffer, boolean update) {
-        short[] newBuffer;
+    public synchronized void updateAudioData(float[] buffer, boolean update) {
+        float[] newBuffer;
         if (rawHistory.size() == MAX_HISTORY) {
             newBuffer = rawHistory.poll();
             System.arraycopy(buffer, 0, newBuffer, 0, buffer.length);
@@ -74,7 +76,7 @@ public class WaveformView extends SurfaceView {
     public void drawAll(Canvas canvas) {
         canvas.drawColor(Color.WHITE);
         Paint paint = new Paint();
-        paint.setColor(Color.RED);
+        paint.setColor(0xFFFF0000);
         float width = getWidth();
         float height = getHeight() / 4;
         float yCenter = height;
@@ -82,14 +84,14 @@ public class WaveformView extends SurfaceView {
         int pixelX = 0;
         float lastX = -1;
         float lastY = 0;
-        for (short[] buffer : rawHistory) {
+        for (float[] buffer : rawHistory) {
             for (int x = 0; x < width / MAX_HISTORY; x++) {
                 int i = (int) ((x / (width / MAX_HISTORY)) * buffer.length);
-                short sample = buffer[i];
-                float y = (-sample / MAX_AMPLITUDE) * height + yCenter;
+                float sample = buffer[i];
+                float y = (-sample) * height + yCenter;
                 if (lastX != -1) {
                     canvas.drawLine(lastX, lastY, pixelX, y, paint);
-                    System.out.printf("%f %f %d %f\n", lastX, lastY, pixelX, y);
+                    //System.out.printf("%f %f %d %f\n", lastX, lastY, pixelX, y);
                 }
                 lastX = pixelX;
                 lastY = y;
@@ -97,5 +99,34 @@ public class WaveformView extends SurfaceView {
             }
             bufferIndex++;
         }
+        lastX = -1;
+        paint.setColor(Color.GREEN);
+        yCenter = height * 3;
+        if (fourier != null && fourier.length > 0) {
+            for (int x = 0; x < width; x++) {
+                int i = (int) ((x / width) * fourier.length);
+                float y = (-fourier[i] * height) + yCenter;
+                if (lastX != -1) {
+                    canvas.drawLine(lastX, lastY, x, y, paint);
+                }
+                lastX = x;
+                lastY = y;
+            }
+        }
+    }
+
+    @Override
+    public void surfaceCreated(SurfaceHolder holder) {
+        updateDisplay();
+    }
+
+    @Override
+    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+        updateDisplay();
+    }
+
+    @Override
+    public void surfaceDestroyed(SurfaceHolder holder) {
+
     }
 }

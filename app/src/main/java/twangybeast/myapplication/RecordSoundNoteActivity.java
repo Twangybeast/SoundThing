@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.SurfaceHolder;
@@ -25,6 +26,7 @@ public class RecordSoundNoteActivity extends AppCompatActivity{
     public static int SAMPLE_RATE = 16000;
     public static int CHANNEL = AudioFormat.CHANNEL_IN_MONO;
     public static int ENCODING = AudioFormat.ENCODING_PCM_16BIT;
+    public static final int MAX_AMPLITUDE = 1 << 15 - 1;
     int bufferSize = 0;
     AudioRecord audioRecord;
     BufferedOutputStream os;
@@ -64,8 +66,13 @@ public class RecordSoundNoteActivity extends AppCompatActivity{
             processTime(amountRead);
         }
     }
-    public void processBytes(short[] data, int amount)
+    public void processBytes(short[] in, int amount)
     {
+        float[] data = AudioAnalysis.toFloatArray(in, MAX_AMPLITUDE);
+        int N = Integer.highestOneBit(amount);
+        float[] fourier = new float[N];
+        AudioAnalysis.calculateFourier(data, fourier, N);
+        waveView.updateFourierValues(fourier);
         waveView.updateAudioData(data, true);
     }
     public void processTime(int amountRead)
