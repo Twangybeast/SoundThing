@@ -34,6 +34,7 @@ public class RecordSoundNoteActivity extends AppCompatActivity{
     Thread recordThread;
     long totalRead = 0;
     int currentTime = 0;
+    private float mLastFourierMax = 0;
     TextView time;
     WaveformView waveView;
     @Override
@@ -71,7 +72,12 @@ public class RecordSoundNoteActivity extends AppCompatActivity{
         float[] data = AudioAnalysis.toFloatArray(in, MAX_AMPLITUDE);
         int N = Integer.highestOneBit(amount);
         float[] fourier = new float[N];
-        AudioAnalysis.calculateFourier(data, fourier, N);
+        float max = AudioAnalysis.calculateFourier(data, fourier, N);
+        if (mLastFourierMax < max)
+        {
+            mLastFourierMax = max;
+        }
+        AudioAnalysis.restrictFloatArray(fourier, mLastFourierMax);
         waveView.updateFourierValues(fourier);
         waveView.updateAudioData(data, true);
     }
