@@ -4,9 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="twangybeast.myapplication.RecordSoundNoteActivity">
+    tools:context="twangybeast.myapplication.activities.RecordSoundNoteActivity">
 
-    <twangybeast.myapplication.WaveformView
+    <twangybeast.myapplication.views.WaveformView
         android:id="@+id/WaveView"
         android:layout_width="0dp"
         android:layout_height="0dp"

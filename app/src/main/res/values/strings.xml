@@ -6,6 +6,12 @@
     <string name="button_resume_record">Resume</string>
     <string name="button_pause_record">Pause</string>
     <string name="button_done_record">Done</string>
+    <string name="button_browse_notes">View Notes</string>
+    <string name="toast_saving">Saving...</string>
+    <string name="toast_saved">Saved!</string>
+    <string name="toast_save_failed">Save Failed!</string>
+    <string name="hint_note_title">Note Title</string>
+    <string name="hint_note_body">Note body</string>
 
     <!-- TODO: Remove or change this placeholder text -->
 </resources>

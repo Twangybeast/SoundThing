@@ -1,6 +1,7 @@
 package twangybeast.myapplication;
 
 import org.junit.Test;
+import twangybeast.myapplication.soundAnalysis.FFT;
 
 import static org.junit.Assert.*;
 
@@ -13,5 +14,6 @@ public class ExampleUnitTest {
     @Test
     public void addition_isCorrect() throws Exception {
         assertEquals(4, 2 + 2);
+        FFT.main(new String[]{"32"});
     }
 }

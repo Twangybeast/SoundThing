@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="twangybeast.myapplication.SoundDisplayActivity">
+    tools:context="twangybeast.myapplication.activities.SoundDisplayActivity">
     <Button
         android:id="@+id/button2"
         android:layout_width="wrap_content"

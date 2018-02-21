@@ -4,19 +4,28 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="twangybeast.myapplication.NoteEditActivity">
+    tools:context="twangybeast.myapplication.activities.NoteEditActivity">
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="TextView"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginBottom="8dp"
-        android:layout_marginRight="8dp"
-        app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginLeft="8dp"
-        app:layout_constraintLeft_toLeftOf="parent" />
+    <EditText
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:inputType="textMultiLine"
+            android:ems="10"
+            android:layout_marginLeft="8dp"
+            app:layout_constraintLeft_toLeftOf="parent" android:id="@+id/editNoteBody"
+            app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="8dp"
+            app:layout_constraintBottom_toBottomOf="parent" android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp" app:layout_constraintTop_toBottomOf="@+id/editNoteTitle"
+            android:gravity="top" android:background="@android:color/transparent"
+            app:layout_constraintStart_toStartOf="parent" android:layout_marginStart="8dp"
+            android:hint="@string/hint_note_body"/>
+    <EditText
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:inputType="textPersonName"
+            android:ems="10"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="8dp" android:id="@+id/editNoteTitle" app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginEnd="8dp" app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="8dp" android:hint="@string/hint_note_title"/>
 </android.support.constraint.ConstraintLayout>

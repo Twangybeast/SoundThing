@@ -1,37 +1,36 @@
-package twangybeast.myapplication;
+package twangybeast.myapplication.views;
 
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.drawable.Drawable;
-import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.View;
 
 /**
  * TODO: document your custom view class.
  */
-public class SoundView extends SurfaceView implements SurfaceHolder.Callback{
+public class SoundView extends SurfaceView implements SurfaceHolder.Callback
+{
 
-    public SoundView(Context context) {
+    public SoundView(Context context)
+    {
         super(context);
     }
 
-    public SoundView(Context context, AttributeSet attrs) {
+    public SoundView(Context context, AttributeSet attrs)
+    {
         super(context, attrs);
     }
 
-    public SoundView(Context context, AttributeSet attrs, int defStyle) {
+    public SoundView(Context context, AttributeSet attrs, int defStyle)
+    {
         super(context, attrs, defStyle);
     }
 
 
     @Override
-    protected void onDraw(Canvas canvas) {
+    protected void onDraw(Canvas canvas)
+    {
         super.onDraw(canvas);
 
 
@@ -47,17 +46,20 @@ public class SoundView extends SurfaceView implements SurfaceHolder.Callback{
     }
 
     @Override
-    public void surfaceCreated(SurfaceHolder holder) {
+    public void surfaceCreated(SurfaceHolder holder)
+    {
 
     }
 
     @Override
-    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height)
+    {
 
     }
 
     @Override
-    public void surfaceDestroyed(SurfaceHolder holder) {
+    public void surfaceDestroyed(SurfaceHolder holder)
+    {
 
     }
 }
