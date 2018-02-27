@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/CS IA.iml" filepath="$PROJECT_DIR$/CS IA.iml" />
+      <module fileurl="file://C:\Users\chendan19\AndroidStudioProjects\MyApplication\CS IA.iml" filepath="C:\Users\chendan19\AndroidStudioProjects\MyApplication\CS IA.iml" />
+      <module fileurl="file://$PROJECT_DIR$/MyApplication.iml" filepath="$PROJECT_DIR$/MyApplication.iml" />
       <module fileurl="file://C:\Users\Twangybeast\AndroidStudioProjects\CS IA\MyApplication.iml" filepath="C:\Users\Twangybeast\AndroidStudioProjects\CS IA\MyApplication.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>

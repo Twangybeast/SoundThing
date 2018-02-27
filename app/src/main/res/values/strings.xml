@@ -14,4 +14,5 @@
     <string name="hint_note_body">Note body</string>
     <string name="text_default_note_title">Note Title</string>
     <string name="text_default_last_modified">Last Modified</string>
+    <string name="action_delete">Delete</string>
 </resources>

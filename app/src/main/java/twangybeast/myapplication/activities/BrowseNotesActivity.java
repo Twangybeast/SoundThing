@@ -6,6 +6,8 @@ import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
@@ -22,6 +24,8 @@ public class BrowseNotesActivity extends AppCompatActivity
     public static final String MAIN_NOTE_FOLDER = "notes";
     private NoteFileAdapter mAdapter;
     private ListView mList;
+    private static final int TRASH_ID = 101;
+    private File mDir;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -32,8 +36,8 @@ public class BrowseNotesActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         String directory = getIntent().getStringExtra(EXTRA_BROWSING_DIRECTORY);
-        File dir = new File(directory);
-        mAdapter = new NoteFileAdapter(this, dir.listFiles());
+        mDir = new File(directory);
+        mAdapter = new NoteFileAdapter(this, mDir.listFiles());
         mList = findViewById(R.id.layoutNotesList);
         mList.setAdapter(mAdapter);
         mList.setOnItemClickListener(new AdapterView.OnItemClickListener()
@@ -96,6 +100,43 @@ public class BrowseNotesActivity extends AppCompatActivity
         mAdapter.mIsSelecting = false;
         mAdapter.clearSelected();
         mAdapter.notifyDataSetChanged();
+    }
+    public void delete()
+    {
+        mAdapter.deleteSelected();
+        mAdapter.updateFiles(mDir.listFiles());
+        stopSelecting();
+    }
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu)
+    {
+        if (mAdapter.mIsSelecting)
+        {
+            System.out.println("asdf");
+            if (menu.findItem(TRASH_ID) == null)
+            {
+                System.out.println("aflksdajsdlfk");
+                MenuItem trash = menu.add(Menu.NONE, TRASH_ID, Menu.NONE, R.string.action_delete);
+                trash.setIcon(android.R.drawable.ic_delete);
+                trash.setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
+                trash.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        delete();
+                        return true;
+                    }
+                });
+            }
+        }
+        else
+        {
+            if (menu.findItem(TRASH_ID) != null)
+            {
+                menu.removeItem(TRASH_ID);
+            }
+        }
+        super.onPrepareOptionsMenu(menu);
+        return true;
     }
     @Override
     public void onBackPressed()

@@ -39,22 +39,7 @@ public class NoteFileAdapter extends BaseAdapter
     {
         this.mContext = context;
         mInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        mData = new ArrayList<>(files.length);
-        for (int i = 0; i < files.length; i++)
-        {
-            mData.add(null);
-        }
-        Arrays.sort(files, new Comparator<File>()
-        {
-            @Override
-            public int compare(File o1, File o2)
-            {
-                return (int) (o2.lastModified() - o1.lastModified());
-            }
-        });
-        mFiles = files;
-        mIsSelecting = false;
-        refreshItemInfos();
+        updateFiles(files);
     }
     @Override
     public int getCount()
@@ -77,8 +62,27 @@ public class NoteFileAdapter extends BaseAdapter
     {
         return mFiles[position].getAbsolutePath();
     }
+    public void updateFiles(File[] files)
+    {
+        mData = new ArrayList<>(files.length);
+        for (int i = 0; i < files.length; i++)
+        {
+            mData.add(null);
+        }
+        mFiles = files;
+        mIsSelecting = false;
+        refreshItemInfos();
+    }
     public void refreshItemInfos()
     {
+        Arrays.sort(mFiles, new Comparator<File>()
+        {
+            @Override
+            public int compare(File o1, File o2)
+            {
+                return (int) (o2.lastModified() - o1.lastModified());
+            }
+        });
         DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
 
         for (int i = 0; i < mFiles.length; i++)
@@ -99,6 +103,15 @@ public class NoteFileAdapter extends BaseAdapter
                 Log.e(TAG, "Error loading files to view.");
                 FileNoteManager.printAllFileContents(file, TAG);
                 e.printStackTrace();
+            }
+        }
+    }
+    public void deleteSelected()
+    {
+        for (int i = 0; i < mData.size(); i++) {
+            if (mData.get(i).isSelected)
+            {
+                mFiles[i].delete();
             }
         }
     }
