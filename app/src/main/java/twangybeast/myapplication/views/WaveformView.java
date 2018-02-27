@@ -13,7 +13,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 /**
- * TODO: document your custom view class.
+ *
  */
 public class WaveformView extends SurfaceView implements SurfaceHolder.Callback
 {

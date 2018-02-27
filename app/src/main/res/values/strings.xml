@@ -12,6 +12,6 @@
     <string name="toast_save_failed">Save Failed!</string>
     <string name="hint_note_title">Note Title</string>
     <string name="hint_note_body">Note body</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
+    <string name="text_default_note_title">Note Title</string>
+    <string name="text_default_last_modified">Last Modified</string>
 </resources>

@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import twangybeast.myapplication.R;
 
+import java.io.File;
 import java.io.Serializable;
 
 public class MainActivity extends AppCompatActivity
@@ -50,6 +51,7 @@ public class MainActivity extends AppCompatActivity
     public void onBrowseNotesClick(View view)
     {
         Intent intent = new Intent(this, BrowseNotesActivity.class);
+        intent.putExtra(BrowseNotesActivity.EXTRA_BROWSING_DIRECTORY, BrowseNotesActivity.getDefaultFolder(this).getAbsolutePath());
         startActivity(intent);
     }
 }

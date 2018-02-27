@@ -6,6 +6,7 @@ import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
@@ -24,8 +25,8 @@ public class RecordSoundNoteActivity extends AppCompatActivity
     public static final String FILE_PREFIX = "voiceRecording";
     public static final String FILE_SUFFIX = ".wav";
     public static final String EXTRA_SOUND_FILE_NAME = "soundFileName";
-    public static int SAMPLE_RATE = new int[]{16000, 44100}[1];
-    public static int CHANNEL = AudioFormat.CHANNEL_IN_MONO;
+    public static int SAMPLE_RATE = new int[]{16000, 44100}[0];
+    public static int CHANNEL = AudioFormat.CHANNEL_CONFIGURATION_MONO;
     public static int ENCODING = AudioFormat.ENCODING_PCM_16BIT;
     public static final int MAX_AMPLITUDE = 1 << 15 - 1;
     int bufferSize = 0;
@@ -68,7 +69,7 @@ public class RecordSoundNoteActivity extends AppCompatActivity
 
     public void recordBytes()
     {
-        short[] data = new short[bufferSize / 4];
+        short[] data = new short[bufferSize / 2];
         displayArr = new float[data.length];
         while (isRecording)
         {
@@ -96,7 +97,9 @@ public class RecordSoundNoteActivity extends AppCompatActivity
         int N = Integer.highestOneBit(amount);
         Complex[] fourier = new Complex[N];
         AudioAnalysis.calculateFourier(data, fourier, N);
-        fourier = AudioAnalysis.getUpperHalf(fourier);
+        //fourier = AudioAnalysis.getUpperHalf(fourier);
+        fourier = AudioAnalysis.getRange(fourier, 0, 300);
+        AudioAnalysis.restrictComplexArray(fourier, N/4);
         waveView.updateFourierValues(fourier);
     }
 

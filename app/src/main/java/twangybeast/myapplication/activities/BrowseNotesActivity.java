@@ -1,75 +1,112 @@
 package twangybeast.myapplication.activities;
 
+import android.content.Context;
 import android.content.Intent;
-import android.provider.ContactsContract;
+import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.CheckBox;
+import android.widget.ListView;
 import twangybeast.myapplication.R;
-import twangybeast.myapplication.views.NoteSummaryView;
+import twangybeast.myapplication.adapters.NoteFileAdapter;
 
 import java.io.*;
-import java.text.DateFormat;
-import java.util.Date;
 
-public class BrowseNotesActivity extends AppCompatActivity implements View.OnClickListener
-{
+public class BrowseNotesActivity extends AppCompatActivity
+{//TODO categories
     public static final String TAG = "BrowseNotesActivity";
-    NoteSummaryView[] noteSummaryViews;
+    public static final String EXTRA_BROWSING_DIRECTORY = "BrowsingDirectory";
+    public static final String MAIN_NOTE_FOLDER = "notes";
+    private NoteFileAdapter mAdapter;
+    private ListView mList;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_browse_notes);
+        
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
-        generateNotesList();
+        String directory = getIntent().getStringExtra(EXTRA_BROWSING_DIRECTORY);
+        File dir = new File(directory);
+        mAdapter = new NoteFileAdapter(this, dir.listFiles());
+        mList = findViewById(R.id.layoutNotesList);
+        mList.setAdapter(mAdapter);
+        mList.setOnItemClickListener(new AdapterView.OnItemClickListener()
+        {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+            {
+                if (mAdapter.mIsSelecting)
+                {
+                    CheckBox checkBox = view.findViewById(R.id.checkboxNoteFile);
+                    checkBox.performClick();
+                    mAdapter.select(position, checkBox.isChecked());
+                }
+                else
+                {
+                    Intent intent = new Intent(BrowseNotesActivity.this, NoteEditActivity.class);//TODO differentiate file vs directory
+                    intent.putExtra(NoteEditActivity.EXTRA_NOTE_FILE_NAME, mAdapter.getFilePath(position));
+                    startActivity(intent);
+                }
+            }
+        });
+        mList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener()
+        {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id)
+            {
+                boolean alreadySelecting = mAdapter.mIsSelecting;
+                startSelecting();
+                mAdapter.select(position, true);
+                mAdapter.notifyDataSetChanged();
+                return !alreadySelecting;
+            }
+        });
+    }
+    public static File getDefaultFolder(Context context)
+    {
+        File dir = new File(context.getFilesDir() + File.pathSeparator + MAIN_NOTE_FOLDER);
+        if (!dir.exists() || !dir.isDirectory())
+        {
+            dir.mkdir();
+        }
+        return dir;
     }
     @Override
     public void onResume()
     {
-        generateNotesList();
+        mAdapter.refreshItemInfos();
+        mAdapter.notifyDataSetChanged();
         super.onResume();
     }
-    public void generateNotesList()
+    public void startSelecting()
     {
-        File dir = getFilesDir();
-        DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
-        ViewGroup layout = findViewById(R.id.layoutNotesList);
-        layout.removeAllViews();
-        File[] files = dir.listFiles();
-        noteSummaryViews = new NoteSummaryView[files.length];
-        for (int i =0 ;i<files.length;i++)
-        {
-            try
-            {
-                File file = files[i];
-                NoteSummaryView noteSummaryView = new NoteSummaryView(this);
-                DataInputStream in = new DataInputStream(new FileInputStream(file));
-                noteSummaryView.setNoteTitle(NoteEditActivity.readString(in));
-                in.close();
-                long time = file.lastModified();
-                noteSummaryView.setLastModified(dateFormat.format(new Date(time)));
-                noteSummaryView.setFilePath(file.getPath());
-                noteSummaryView.setOnClickListener(this);
-                noteSummaryView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-                layout.addView(noteSummaryView);
-                noteSummaryViews[i] = noteSummaryView;
-            }
-            catch (IOException e)
-            {
-                Log.e(TAG, "Error loading files to view.");
-                e.printStackTrace();
-            }
-        }
+        mAdapter.mIsSelecting = true;
+        Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        vibrator.vibrate(100);
+        mAdapter.clearSelected();
+    }
+    public void stopSelecting()
+    {
+        mAdapter.mIsSelecting = false;
+        mAdapter.clearSelected();
+        mAdapter.notifyDataSetChanged();
     }
     @Override
-    public void onClick(View v)
+    public void onBackPressed()
     {
-        NoteSummaryView noteSummaryView = (NoteSummaryView)(v);
-        Intent intent = new Intent(this, NoteEditActivity.class);
-        intent.putExtra(NoteEditActivity.EXTRA_NOTE_FILE_NAME, noteSummaryView.getFilePath());
-        startActivity(intent);
+        if (mAdapter.mIsSelecting)
+        {
+            stopSelecting();
+        }
+        else
+        {
+            super.onBackPressed();
+        }
     }
 }

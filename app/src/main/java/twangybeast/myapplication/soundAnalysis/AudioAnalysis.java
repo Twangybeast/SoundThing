@@ -1,5 +1,7 @@
 package twangybeast.myapplication.soundAnalysis;
 
+import java.util.Arrays;
+
 /**
  * Created by cHeNdAn19 on 2/15/2018.
  */
@@ -11,7 +13,7 @@ public class AudioAnalysis
         float[] out = new float[N];
         for (int i = 0; i < N; i++)
         {
-            out[i] = in[i] / max;
+            out[i] = (float) in[i] / max;
         }
         return out;
     }
@@ -23,7 +25,13 @@ public class AudioAnalysis
             in[i] = in[i] / max;
         }
     }
-
+    public static void restrictComplexArray(Complex[] in, float max)
+    {
+        for (int i = 0; i < in.length; i++)
+        {
+            in[i] = in[i].divide(max);
+        }
+    }
     //TODO REMOVE COMMENT
     //See https://en.wikipedia.org/wiki/Cooley%E2%80%93Tukey_FFT_algorithm#C++_Example_Code
     public static void calculateFourier(float[] input, Complex[] data, int N)
@@ -94,5 +102,11 @@ public class AudioAnalysis
             upper[i] = in[i + upper.length / 2];
         }
         return upper;
+    }
+    public static Complex[] getRange(Complex[] in, int i, int length)
+    {
+        Complex[] res = new Complex[length];
+        System.arraycopy(in, i, res, 0, length);
+        return res;
     }
 }

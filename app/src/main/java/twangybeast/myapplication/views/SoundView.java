@@ -7,7 +7,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 /**
- * TODO: document your custom view class.
+ *
  */
 public class SoundView extends SurfaceView implements SurfaceHolder.Callback
 {
@@ -34,7 +34,6 @@ public class SoundView extends SurfaceView implements SurfaceHolder.Callback
         super.onDraw(canvas);
 
 
-        // TODO: consider storing these as member variables to reduce
         // allocations per draw cycle.
         int paddingLeft = getPaddingLeft();
         int paddingTop = getPaddingTop();

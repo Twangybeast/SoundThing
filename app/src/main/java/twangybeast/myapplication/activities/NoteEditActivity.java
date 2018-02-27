@@ -78,7 +78,7 @@ public class NoteEditActivity extends AppCompatActivity
         String noteTitle = mNoteTitle.getText().toString();
         if (file == null)
         {
-            file= getNewFile(getFilesDir(), noteTitle, NOTE_FILE_SUFFIX);
+            file= getNewFile(BrowseNotesActivity.getDefaultFolder(this), noteTitle, NOTE_FILE_SUFFIX);
         }
         try
         {
@@ -108,6 +108,10 @@ public class NoteEditActivity extends AppCompatActivity
         int length;
         byte[] data;
         length = in.readInt();
+        if (length > 1000000)
+        {
+            throw new IOException();
+        }
         data = new byte[length];
         in.readFully(data);
         return new String(data, "UTF-8");
