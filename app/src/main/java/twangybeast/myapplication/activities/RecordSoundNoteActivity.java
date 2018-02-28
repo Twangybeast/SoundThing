@@ -22,9 +22,8 @@ import java.io.File;
 public class RecordSoundNoteActivity extends AppCompatActivity
 {
     File file;
-    public static final String FILE_PREFIX = "voiceRecording";
-    public static final String FILE_SUFFIX = ".wav";
-    public static final String EXTRA_SOUND_FILE_NAME = "soundFileName";
+    public static final String VOICE_FILE_NAME= "Voice Note ";
+    public static final String VOICE_FILE_SUFFIX = ".voice";
     public static int SAMPLE_RATE = new int[]{16000, 44100}[0];
     public static int CHANNEL = AudioFormat.CHANNEL_CONFIGURATION_MONO;
     public static int ENCODING = AudioFormat.ENCODING_PCM_16BIT;
@@ -36,13 +35,10 @@ public class RecordSoundNoteActivity extends AppCompatActivity
     Thread recordThread;
     Thread displayThread;
     long totalRead = 0;
-    int currentTime = 0;
-    private float mLastFourierMax = 1;
     TextView time;
     WaveformView waveView;
-    Object displayArrayLock = new Object();
     float[] displayArr = null;
-
+    int currentTime=0;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -58,10 +54,10 @@ public class RecordSoundNoteActivity extends AppCompatActivity
 
     public void chooseSoundFile()
     {
-        int i = 0;
+        int i = 1;
         do
         {
-            file = new File(this.getExternalFilesDir(null), String.format("%s%d%s", FILE_PREFIX, i, FILE_SUFFIX));
+            file = new File(this.getExternalFilesDir(null), String.format("%s(%d)%s", VOICE_FILE_NAME, i, VOICE_FILE_SUFFIX));
             i++;
         }
         while (file.exists());
@@ -74,14 +70,8 @@ public class RecordSoundNoteActivity extends AppCompatActivity
         while (isRecording)
         {
             int amountRead = audioRecord.read(data, 0, data.length);
-            long t1 = System.currentTimeMillis();
             updateBytesToDisplay(data, amountRead);
-            int cycleTime = (int) (System.currentTimeMillis() - t1);
             processTime(amountRead);
-            if (cycleTime > 20)
-            {
-                System.out.println(cycleTime);
-            }
         }
     }
 
@@ -98,7 +88,7 @@ public class RecordSoundNoteActivity extends AppCompatActivity
         Complex[] fourier = new Complex[N];
         AudioAnalysis.calculateFourier(data, fourier, N);
         //fourier = AudioAnalysis.getUpperHalf(fourier);
-        fourier = AudioAnalysis.getRange(fourier, 0, 300);
+        fourier = AudioAnalysis.getRange(fourier, 0, (N/2)/8);
         AudioAnalysis.restrictComplexArray(fourier, N/4);
         waveView.updateFourierValues(fourier);
     }

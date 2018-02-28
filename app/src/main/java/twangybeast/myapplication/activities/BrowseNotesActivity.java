@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -94,12 +95,14 @@ public class BrowseNotesActivity extends AppCompatActivity
         Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         vibrator.vibrate(100);
         mAdapter.clearSelected();
+        supportInvalidateOptionsMenu();
     }
     public void stopSelecting()
     {
         mAdapter.mIsSelecting = false;
         mAdapter.clearSelected();
         mAdapter.notifyDataSetChanged();
+        supportInvalidateOptionsMenu();
     }
     public void delete()
     {
@@ -108,8 +111,16 @@ public class BrowseNotesActivity extends AppCompatActivity
         stopSelecting();
     }
     @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.toolbar_default, menu);
+        return true;
+    }
+    @Override
     public boolean onPrepareOptionsMenu(Menu menu)
     {
+        System.out.println("asdfff");
         if (mAdapter.mIsSelecting)
         {
             System.out.println("asdf");
@@ -117,7 +128,7 @@ public class BrowseNotesActivity extends AppCompatActivity
             {
                 System.out.println("aflksdajsdlfk");
                 MenuItem trash = menu.add(Menu.NONE, TRASH_ID, Menu.NONE, R.string.action_delete);
-                trash.setIcon(android.R.drawable.ic_delete);
+                trash.setIcon(android.R.drawable.ic_menu_delete);
                 trash.setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
                 trash.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                     @Override

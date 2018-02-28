@@ -143,16 +143,29 @@ public class WaveformView extends SurfaceView implements SurfaceHolder.Callback
         float lastY = 0;
         if (fourier != null && fourier.length > 0)
         {
-            for (int x = 0; x < width; x++)
-            {
-                int i = (int) ((x / width) * fourier.length);
-                float y = (-func.getValue(fourier[i]) * height) + yCenter;
-                if (lastX != -1)
-                {
-                    canvas.drawLine(lastX, lastY, x, y, paint);
+            if (fourier.length > width) {
+                for (int x = 0; x < width; x++) {
+                    int i = (int) ((x / width) * fourier.length);
+                    float y = (-func.getValue(fourier[i]) * height) + yCenter;
+                    if (lastX != -1) {
+                        canvas.drawLine(lastX, lastY, x, y, paint);
+                    }
+                    lastX = x;
+                    lastY = y;
                 }
-                lastX = x;
-                lastY = y;
+            }
+            else
+            {
+                for (int i = 0; i < fourier.length; i++) {
+                    int x = (int) ((i*1.0f /fourier.length) * width);
+                    float y = (-func.getValue(fourier[i]) * height) + yCenter;
+                    if (lastX != -1)
+                    {
+                        canvas.drawLine(lastX, lastY, x, y, paint);
+                    }
+                    lastX = x;
+                    lastY = y;
+                }
             }
         }
     }

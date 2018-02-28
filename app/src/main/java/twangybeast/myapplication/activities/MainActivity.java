@@ -23,23 +23,7 @@ public class MainActivity extends AppCompatActivity
     public void onStartSoundNoteClick(View view)
     {
         Intent intent = new Intent(this, RecordSoundNoteActivity.class);
-        startActivityForResult(intent, REQUEST_SOUND_FILE);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data)
-    {
-        //TODO change record sound result behavior
-        switch (requestCode)
-        {
-            case REQUEST_SOUND_FILE:
-                if (resultCode == RESULT_OK)
-                {
-                    //data.setClass(this, NoteEditActivity.class);
-                    //startActivity(data);
-                }
-                break;
-        }
+        startActivity(intent);
     }
 
     public void onStartTextNoteClick(View view)

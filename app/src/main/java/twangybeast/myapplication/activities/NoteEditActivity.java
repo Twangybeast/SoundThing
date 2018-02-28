@@ -3,6 +3,8 @@ package twangybeast.myapplication.activities;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -15,6 +17,7 @@ public class NoteEditActivity extends AppCompatActivity
     public static final String EXTRA_NOTE_FILE_NAME = "noteFileName";
     public static final String NOTE_FILE_SUFFIX = ".note";
     public static final String TAG = "NoteEditActivity";
+    private boolean mChanged;
     EditText mNoteTitle;
     EditText mNoteBody;
     File mNoteFile;
@@ -26,6 +29,24 @@ public class NoteEditActivity extends AppCompatActivity
 
         mNoteTitle = findViewById(R.id.editNoteTitle);
         mNoteBody = findViewById(R.id.editNoteBody);
+        TextWatcher textChangedListener = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                mChanged = true;
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        };
+        mNoteTitle.addTextChangedListener(textChangedListener);
+        mNoteBody.addTextChangedListener(textChangedListener);
         String noteFilePath =getIntent().getStringExtra(NoteEditActivity.EXTRA_NOTE_FILE_NAME);
         if (noteFilePath == null)
         {
@@ -39,6 +60,7 @@ public class NoteEditActivity extends AppCompatActivity
             readFile(mNoteFile);
 
         }
+        mChanged = false;
     }
     public static File getNewFile(File dir, String name, String suffix)
     {
@@ -71,6 +93,11 @@ public class NoteEditActivity extends AppCompatActivity
             }
         }
     }
+    public void cancelSave()
+    {
+        Toast canceled = Toast.makeText(this, R.string.toast_no_change_save_canceled, Toast.LENGTH_SHORT);
+        canceled.show();
+    }
     public void save(File file)
     {
         Toast saving = Toast.makeText(this, R.string.toast_saving, Toast.LENGTH_LONG);
@@ -78,6 +105,11 @@ public class NoteEditActivity extends AppCompatActivity
         String noteTitle = mNoteTitle.getText().toString();
         if (file == null)
         {
+            if (noteTitle.length() == 0 && mNoteBody.getText().length() == 0)
+            {
+                cancelSave();
+                return;
+            }
             file= getNewFile(BrowseNotesActivity.getDefaultFolder(this), noteTitle, NOTE_FILE_SUFFIX);
         }
         try
@@ -119,7 +151,13 @@ public class NoteEditActivity extends AppCompatActivity
     @Override
     public void onBackPressed()
     {
-        save(mNoteFile);
+        if (mChanged) {
+            save(mNoteFile);
+        }
+        else
+        {
+            cancelSave();
+        }
         super.onBackPressed();
     }
 }
