@@ -6,6 +6,7 @@ import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.os.Bundle;
+import android.os.Process;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -17,20 +18,23 @@ import twangybeast.myapplication.R;
 import twangybeast.myapplication.views.WaveformView;
 
 import java.io.BufferedOutputStream;
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 public class RecordSoundNoteActivity extends AppCompatActivity
 {
     File file;
     public static final String VOICE_FILE_NAME= "Voice Note ";
-    public static final String VOICE_FILE_SUFFIX = ".voice";
+    public static final String VOICE_FILE_SUFFIX = ".pcm";
     public static int SAMPLE_RATE = new int[]{16000, 44100}[0];
     public static int CHANNEL = AudioFormat.CHANNEL_CONFIGURATION_MONO;
     public static int ENCODING = AudioFormat.ENCODING_PCM_16BIT;
     public static final int MAX_AMPLITUDE = 1 << 15 - 1;
     int bufferSize = 0;
     AudioRecord audioRecord;
-    BufferedOutputStream os;
     boolean isRecording = false;
     Thread recordThread;
     Thread displayThread;
@@ -67,14 +71,38 @@ public class RecordSoundNoteActivity extends AppCompatActivity
     {
         short[] data = new short[bufferSize / 2];
         displayArr = new float[data.length];
+        DataOutputStream out = null;
+        try {
+            out = new DataOutputStream(new FileOutputStream(file));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
         while (isRecording)
         {
             int amountRead = audioRecord.read(data, 0, data.length);
             updateBytesToDisplay(data, amountRead);
+            writeBytes(out, data, amountRead);
             processTime(amountRead);
         }
+        try {
+            out.flush();
+            out.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-
+    public static void writeBytes(DataOutputStream out, short[] data, int amount)
+    {
+        try {
+            for (int i = 0; i < amount; i++) {
+                out.writeShort(data[i]);
+            }
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+    }
     public void updateBytesToDisplay(short[] in, int amount)
     {
         displayArr = AudioAnalysis.toFloatArray(in, MAX_AMPLITUDE, amount);
@@ -154,6 +182,7 @@ public class RecordSoundNoteActivity extends AppCompatActivity
             @Override
             public void run()
             {
+                android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_AUDIO);
                 recordBytes();
             }
         });
@@ -209,9 +238,6 @@ public class RecordSoundNoteActivity extends AppCompatActivity
         {
             pauseRecord();
         }
-        Intent returnIntent = new Intent();
-        returnIntent.putExtra(RecordSoundNoteActivity.EXTRA_SOUND_FILE_NAME, file);
-        setResult(Activity.RESULT_OK, returnIntent);
         finish();
     }
 

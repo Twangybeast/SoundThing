@@ -6,21 +6,38 @@
     android:layout_height="match_parent"
     tools:context="twangybeast.myapplication.activities.MainActivity">
 
-    <Button
-            android:id="@+id/buttonStartSoundNote"
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar">
+
+        <Button
+            android:id="@+id/buttonViewRecordings"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
-            android:onClick="onStartSoundNoteClick"
-            android:text="@string/button_start_sound_file"
+            android:layout_marginTop="16dp"
+            android:onClick="onBrowseVoiceClick"
+            android:text="@string/button_view_recordings"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/buttonBrowseNotes" />
+
+        <Button
+            android:id="@+id/buttonBrowseNotes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:onClick="onBrowseNotesClick"
+            android:text="@string/button_browse_notes"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            android:layout_marginTop="8dp" app:layout_constraintTop_toBottomOf="@+id/toolbar"/>
+            app:layout_constraintTop_toBottomOf="@+id/buttonStartTextNote" />
 
-    <Button
+        <Button
             android:id="@+id/buttonStartTextNote"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -34,22 +51,29 @@
             android:text="@string/button_start_text_file"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/buttonStartSoundNote"/>
-    <Button
-            android:text="@string/button_browse_notes"
+            app:layout_constraintTop_toBottomOf="@+id/buttonStartSoundNote" />
+
+        <Button
+            android:id="@+id/buttonStartSoundNote"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintLeft_toLeftOf="parent" app:layout_constraintRight_toRightOf="parent"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
             android:layout_marginTop="16dp"
-            app:layout_constraintTop_toBottomOf="@+id/buttonStartTextNote" android:id="@+id/buttonBrowseNotes"
-            android:onClick="onBrowseNotesClick"/>
+            android:onClick="onStartSoundNoteClick"
+            android:text="@string/button_start_sound_file"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </android.support.constraint.ConstraintLayout>
+
     <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            android:elevation="4dp"
-            android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:elevation="4dp"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
 </android.support.constraint.ConstraintLayout>

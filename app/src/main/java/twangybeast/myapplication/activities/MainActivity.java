@@ -38,4 +38,8 @@ public class MainActivity extends AppCompatActivity
         intent.putExtra(BrowseNotesActivity.EXTRA_BROWSING_DIRECTORY, BrowseNotesActivity.getDefaultFolder(this).getAbsolutePath());
         startActivity(intent);
     }
+    public void onBrowseVoiceClick(View view)
+    {
+
+    }
 }
