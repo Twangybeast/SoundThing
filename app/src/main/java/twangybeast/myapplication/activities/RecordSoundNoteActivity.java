@@ -1,6 +1,7 @@
 package twangybeast.myapplication.activities;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
@@ -55,18 +56,24 @@ public class RecordSoundNoteActivity extends AppCompatActivity
         time = findViewById(R.id.textSoundLength);
         waveView = findViewById(R.id.WaveView);
     }
-
+    public static String getSoundDirectory(Context context)
+    {
+        return context.getExternalFilesDir(null)+File.separator+BrowseRecordingsActivity.MAIN_RECORDING_FOLDER;
+    }
     public void chooseSoundFile()
     {
         int i = 1;
         do
         {
-            file = new File(this.getExternalFilesDir(null), String.format("%s(%d)%s", VOICE_FILE_NAME, i, VOICE_FILE_SUFFIX));
+            file = new File(getSoundDirectory(this), String.format("%s(%d)%s", VOICE_FILE_NAME, i, VOICE_FILE_SUFFIX));
             i++;
         }
         while (file.exists());
     }
-
+    public static int getSecondsFromBytes(long bytes)
+    {
+        return (int) ((bytes/2)/SAMPLE_RATE);
+    }
     public void recordBytes()
     {
         short[] data = new short[bufferSize / 2];

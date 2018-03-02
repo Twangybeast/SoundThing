@@ -120,13 +120,10 @@ public class BrowseNotesActivity extends AppCompatActivity
     @Override
     public boolean onPrepareOptionsMenu(Menu menu)
     {
-        System.out.println("asdfff");
         if (mAdapter.mIsSelecting)
         {
-            System.out.println("asdf");
             if (menu.findItem(TRASH_ID) == null)
             {
-                System.out.println("aflksdajsdlfk");
                 MenuItem trash = menu.add(Menu.NONE, TRASH_ID, Menu.NONE, R.string.action_delete);
                 trash.setIcon(android.R.drawable.ic_menu_delete);
                 trash.setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
