@@ -89,23 +89,12 @@ public class RecordingFileAdapter extends BaseAdapter {
         {
             File file = mFiles[i];
             Log.d(TAG, file.getAbsolutePath());
-            try
-            {
-                DataInputStream in = new DataInputStream(new FileInputStream(file));
-                String noteTitle= NoteEditActivity.readString(in);
-                in.close();
-                long time = file.lastModified();
-                String lastModified = dateFormat.format(new Date(time));
-                int recordingLength = RecordSoundNoteActivity.getSecondsFromBytes(file.length());
-                String duration = String.format("%02d:%02d", recordingLength/60, recordingLength%60);
-                mData.set(i, new RecordingFile(noteTitle, lastModified, duration));
-            }
-            catch (IOException e)
-            {
-                Log.e(TAG, "Error loading files to view.");
-                FileNoteManager.printAllFileContents(file, TAG);
-                e.printStackTrace();
-            }
+            //String noteTitle= NoteEditActivity.readString(in);
+            long time = file.lastModified();
+            String lastModified = dateFormat.format(new Date(time));
+            int recordingLength = RecordSoundNoteActivity.getSecondsFromBytes(file.length());
+            String duration = String.format("%02d:%02d", recordingLength/60, recordingLength%60);
+            mData.set(i, new RecordingFile(file.getName(), lastModified, duration));
         }
     }
     public void deleteSelected()

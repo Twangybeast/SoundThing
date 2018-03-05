@@ -19,8 +19,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/textLastModified" android:layout_marginTop="16dp"
-            app:layout_constraintTop_toBottomOf="@+id/textRecordingTitle"
-            app:layout_constraintStart_toStartOf="@+id/textRecordingTitle" app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textNoteTitle"
+            app:layout_constraintStart_toStartOf="@+id/textNoteTitle" app:layout_constraintBottom_toBottomOf="parent"
             android:layout_marginBottom="16dp"/>
     <CheckBox
             android:layout_width="wrap_content"

@@ -1,5 +1,6 @@
 package twangybeast.myapplication.activities;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Vibrator;
@@ -17,22 +18,23 @@ import android.widget.ListView;
 import java.io.File;
 
 import twangybeast.myapplication.R;
-import twangybeast.myapplication.adapters.NoteFileAdapter;
 import twangybeast.myapplication.adapters.RecordingFileAdapter;
 
 public class BrowseRecordingsActivity extends AppCompatActivity {
 
     public static final String MAIN_RECORDING_FOLDER = "recordings";
     public static final String TAG = "BrowseRecordingsActivity";
+    public static final int REQUEST_PROCESS = 139847;
+    public static final String EXTRA_VOICE_FILE = "voiceFile";
     private RecordingFileAdapter mAdapter;
     private ListView mList;
-    private static final int TRASH_ID = 101;
+    private static final int TRASH_ID = 153;
     private File mDir;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_browse_recordings);
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar_browse_recordings);
         setSupportActionBar(toolbar);
 
         mDir = new File(RecordSoundNoteActivity.getSoundDirectory(this));
@@ -52,7 +54,9 @@ public class BrowseRecordingsActivity extends AppCompatActivity {
                 }
                 else
                 {
-                    //TODO PRocesss file
+                    Intent intent = new Intent(BrowseRecordingsActivity.this, ProcessVoiceActivity.class);
+                    intent.putExtra(EXTRA_VOICE_FILE, mAdapter.getFilePath(position));
+                    startActivityForResult(intent, REQUEST_PROCESS);
                 }
             }
         });
@@ -68,6 +72,18 @@ public class BrowseRecordingsActivity extends AppCompatActivity {
                 return !alreadySelecting;
             }
         });
+    }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        if (requestCode == REQUEST_PROCESS)
+        {
+            if (resultCode == Activity.RESULT_OK)
+            {
+                data.setClass(this, NoteEditActivity.class);
+                startActivity(data);
+            }
+        }
     }
     @Override
     public void onResume()

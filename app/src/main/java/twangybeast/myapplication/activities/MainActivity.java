@@ -40,6 +40,7 @@ public class MainActivity extends AppCompatActivity
     }
     public void onBrowseVoiceClick(View view)
     {
-
+        Intent intent = new Intent(this, BrowseRecordingsActivity.class);
+        startActivity(intent);
     }
 }

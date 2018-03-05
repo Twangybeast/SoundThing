@@ -24,8 +24,9 @@
         <activity android:name=".activities.SoundDisplayActivity" />
         <activity android:name=".activities.RecordSoundNoteActivity" />
         <activity android:name=".activities.NoteEditActivity" />
-        <activity android:name=".activities.BrowseNotesActivity"></activity>
-        <activity android:name=".activities.BrowseRecordingsActivity"></activity>
+        <activity android:name=".activities.BrowseNotesActivity" />
+        <activity android:name=".activities.BrowseRecordingsActivity" />
+        <activity android:name=".activities.ProcessVoiceActivity"></activity>
     </application>
 
 </manifest>

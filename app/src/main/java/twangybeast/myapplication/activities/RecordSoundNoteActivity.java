@@ -58,7 +58,12 @@ public class RecordSoundNoteActivity extends AppCompatActivity
     }
     public static String getSoundDirectory(Context context)
     {
-        return context.getExternalFilesDir(null)+File.separator+BrowseRecordingsActivity.MAIN_RECORDING_FOLDER;
+        File file = new File(context.getExternalFilesDir(null)+File.separator+BrowseRecordingsActivity.MAIN_RECORDING_FOLDER);
+        if (!file.exists() || !file.isDirectory())
+        {
+            file.mkdir();
+        }
+        return file.getAbsolutePath();
     }
     public void chooseSoundFile()
     {

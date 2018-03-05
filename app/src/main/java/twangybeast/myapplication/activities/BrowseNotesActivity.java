@@ -33,7 +33,7 @@ public class BrowseNotesActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_browse_notes);
         
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar_browse_notes);
         setSupportActionBar(toolbar);
 
         String directory = getIntent().getStringExtra(EXTRA_BROWSING_DIRECTORY);
