@@ -24,7 +24,7 @@ public class BrowseRecordingsActivity extends AppCompatActivity {
 
     public static final String MAIN_RECORDING_FOLDER = "recordings";
     public static final String TAG = "BrowseRecordingsActivity";
-    public static final int REQUEST_PROCESS = 139847;
+    public static final int REQUEST_PROCESS = 0b1101000001101;
     public static final String EXTRA_VOICE_FILE = "voiceFile";
     private RecordingFileAdapter mAdapter;
     private ListView mList;

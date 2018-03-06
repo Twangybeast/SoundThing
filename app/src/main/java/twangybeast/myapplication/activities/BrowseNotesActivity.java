@@ -26,6 +26,8 @@ public class BrowseNotesActivity extends AppCompatActivity
     private NoteFileAdapter mAdapter;
     private ListView mList;
     private static final int TRASH_ID = 101;
+    private static final int NEW_FOLDER_ID = 104;
+    private static final int MOVE_ID = 106;
     private File mDir;
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -110,6 +112,15 @@ public class BrowseNotesActivity extends AppCompatActivity
         mAdapter.updateFiles(mDir.listFiles());
         stopSelecting();
     }
+    public void newFolder()
+    {
+        //TODO
+        //TODO Disallow same endings as notes
+    }
+    public void move()
+    {
+        //TODO
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
@@ -124,7 +135,7 @@ public class BrowseNotesActivity extends AppCompatActivity
         {
             if (menu.findItem(TRASH_ID) == null)
             {
-                MenuItem trash = menu.add(Menu.NONE, TRASH_ID, Menu.NONE, R.string.action_delete);
+                MenuItem trash = menu.add(Menu.NONE, TRASH_ID, 0, R.string.action_delete);
                 trash.setIcon(android.R.drawable.ic_menu_delete);
                 trash.setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
                 trash.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
@@ -135,12 +146,44 @@ public class BrowseNotesActivity extends AppCompatActivity
                     }
                 });
             }
+            if (menu.findItem(NEW_FOLDER_ID) == null)
+            {
+                final MenuItem newFolder = menu.add(Menu.NONE, NEW_FOLDER_ID, 1, R.string.action_new_folder);
+                newFolder.setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_NEVER);
+                newFolder.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        newFolder();
+                        return true;
+                    }
+                });
+            }
+            if (menu.findItem(MOVE_ID) == null)
+            {
+                final MenuItem move = menu.add(Menu.NONE, MOVE_ID, 2, R.string.action_move_file);
+                move.setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_NEVER);
+                move.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        move();
+                        return true;
+                    }
+                });
+            }
         }
         else
         {
             if (menu.findItem(TRASH_ID) != null)
             {
                 menu.removeItem(TRASH_ID);
+            }
+            if (menu.findItem(NEW_FOLDER_ID) != null)
+            {
+                menu.removeItem(NEW_FOLDER_ID);
+            }
+            if (menu.findItem(MOVE_ID) != null)
+            {
+                menu.removeItem(MOVE_ID);
             }
         }
         super.onPrepareOptionsMenu(menu);

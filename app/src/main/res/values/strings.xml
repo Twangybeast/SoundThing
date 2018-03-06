@@ -17,4 +17,6 @@
     <string name="action_delete">Delete</string>
     <string name="toast_no_change_save_canceled">No change, not saving</string>
     <string name="button_view_recordings">View Voice Recordings</string>
+    <string name="action_new_folder">New Folder</string>
+    <string name="action_move_file">Move</string>
 </resources>

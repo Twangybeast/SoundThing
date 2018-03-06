@@ -10,6 +10,8 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 import twangybeast.myapplication.R;
 import twangybeast.myapplication.activities.NoteEditActivity;
+import twangybeast.myapplication.models.FileItem;
+import twangybeast.myapplication.models.FolderFile;
 import twangybeast.myapplication.models.NoteFile;
 import twangybeast.myapplication.util.FileNoteManager;
 
@@ -31,7 +33,7 @@ public class NoteFileAdapter extends BaseAdapter
 {
     public static final String TAG = "NoteFileAdapter";
     Context mContext;
-    public ArrayList<NoteFile> mData;
+    public ArrayList<FileItem> mData;
     LayoutInflater mInflater;
     File[] mFiles;
     public boolean mIsSelecting;
@@ -91,12 +93,21 @@ public class NoteFileAdapter extends BaseAdapter
             Log.d(TAG, file.getAbsolutePath());
             try
             {
-                DataInputStream in = new DataInputStream(new FileInputStream(file));
-                String noteTitle= NoteEditActivity.readString(in);
-                in.close();
-                long time = file.lastModified();
-                String lastModified = dateFormat.format(new Date(time));
-                mData.set(i, new NoteFile(noteTitle, lastModified));
+                if (file.isDirectory())
+                {
+                    //Is a folder
+                    String title = file.getName();
+                    mData.set(i, new FolderFile(title));
+                }
+                else {
+                    //Is note file
+                    DataInputStream in = new DataInputStream(new FileInputStream(file));
+                    String fileTitle = NoteEditActivity.readString(in);
+                    in.close();
+                    long time = file.lastModified();
+                    String lastModified = dateFormat.format(new Date(time));
+                    mData.set(i, new NoteFile(fileTitle, lastModified));
+                }
             }
             catch (IOException e)
             {
@@ -117,9 +128,9 @@ public class NoteFileAdapter extends BaseAdapter
     }
     public void clearSelected()
     {
-        for (NoteFile noteFile : mData)
+        for (FileItem fileItem : mData)
         {
-            noteFile.isSelected = false;
+            fileItem.isSelected = false;
         }
     }
     public void select(int position, boolean val)
@@ -129,28 +140,46 @@ public class NoteFileAdapter extends BaseAdapter
     @Override
     public View getView(int position, View convertView, ViewGroup parent)
     {
-        NoteFile noteFile = mData.get(position);
-        View rowView = mInflater.inflate(R.layout.item_notes_list, parent, false);
-        TextView textTitle =rowView.findViewById(R.id.textNoteTitle);
-        TextView textLastModified = rowView.findViewById(R.id.textLastModified);
-        CheckBox checkBox = rowView.findViewById(R.id.checkboxNoteFile);
-        if (noteFile != null)
+        FileItem fileItem= mData.get(position);
+        if (fileItem instanceof NoteFile) {
+            NoteFile noteFile = (NoteFile) fileItem;
+            View rowView = mInflater.inflate(R.layout.item_notes_list, parent, false);
+            TextView textTitle = rowView.findViewById(R.id.textNoteTitle);
+            TextView textLastModified = rowView.findViewById(R.id.textLastModified);
+            CheckBox checkBox = rowView.findViewById(R.id.checkboxNoteFile);
+            if (noteFile != null) {
+                textTitle.setText(noteFile.fileTitle);
+                textLastModified.setText(noteFile.lastModified);
+                if (mIsSelecting) {
+                    checkBox.setChecked(noteFile.isSelected);
+                } else {
+                    checkBox.setVisibility(View.GONE);
+                }
+            } else {
+                checkBox.setVisibility(View.GONE);
+            }
+            return rowView;
+        }
+        else
         {
-            textTitle.setText(noteFile.noteTitle);
-            textLastModified.setText(noteFile.lastModified);
-            if (mIsSelecting)
+            View rowView = mInflater.inflate(R.layout.item_folder_list, parent, false);
+            TextView textTitle = rowView.findViewById(R.id.textFolderTitle);
+            CheckBox checkBox = rowView.findViewById(R.id.checkboxFolder);
+            if (fileItem != null)
             {
-                checkBox.setChecked(noteFile.isSelected);
+                FolderFile folder = (FolderFile) fileItem;
+                textTitle.setText(folder.fileTitle);
+                if (mIsSelecting) {
+                    checkBox.setChecked(folder.isSelected);
+                } else {
+                    checkBox.setVisibility(View.GONE);
+                }
             }
             else
             {
                 checkBox.setVisibility(View.GONE);
             }
+            return rowView;
         }
-        else
-        {
-            checkBox.setVisibility(View.GONE);
-        }
-        return rowView;
     }
 }

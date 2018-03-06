@@ -1,22 +1,15 @@
 package twangybeast.myapplication.models;
 
 /**
- * Created by Twangybeast on 2/21/2018.
+ * Created by cHeNdAn19 on 3/6/2018.
  */
 
-public class NoteFile
+public class NoteFile extends FileItem
 {
-    public String noteTitle;
     public String lastModified;
-    public boolean isSelected;
     public NoteFile(String noteTitle, String lastModified)
     {
-        this.noteTitle = noteTitle;
+        super(noteTitle);
         this.lastModified = lastModified;
-        isSelected = false;
-    }
-    public void toggle()
-    {
-        isSelected = !isSelected;
     }
 }

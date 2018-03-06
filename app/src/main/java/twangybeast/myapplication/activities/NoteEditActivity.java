@@ -114,16 +114,7 @@ public class NoteEditActivity extends AppCompatActivity
         }
         try
         {
-            DataOutputStream out = new DataOutputStream(new FileOutputStream(file));
-            byte[] data;
-            data = noteTitle.getBytes("UTF-8");
-            out.writeInt(data.length);
-            out.write(data);
-            data = mNoteBody.getText().toString().getBytes("UTF-8");
-            out.writeInt(data.length);
-            out.write(data);
-            out.flush();
-            out.close();
+            saveFile(file, noteTitle, mNoteBody.getText().toString());
             saving.cancel();
             Toast saved = Toast.makeText(this, R.string.toast_saved, Toast.LENGTH_SHORT);
             saved.show();
@@ -134,6 +125,21 @@ public class NoteEditActivity extends AppCompatActivity
             Toast failed = Toast.makeText(this, R.string.toast_save_failed, Toast.LENGTH_SHORT);
             failed.show();
         }
+    }
+    public static void saveFile(File file, String title, String body) throws IOException
+    {
+        DataOutputStream out = new DataOutputStream(new FileOutputStream(file));
+        writeString(out, title);
+        writeString(out, body);
+        out.flush();
+        out.close();
+    }
+    public static void writeString(DataOutputStream out, String str) throws IOException
+    {
+        byte[] data;
+        data = str.getBytes("UTF-8");
+        out.writeInt(data.length);
+        out.write(data);
     }
     public static String readString(DataInputStream in) throws IOException
     {

@@ -2,12 +2,23 @@ package twangybeast.myapplication.activities;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.media.AudioFormat;
+import android.media.AudioManager;
+import android.media.AudioTrack;
 import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.ProgressBar;
 
+import java.io.BufferedWriter;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 
 import twangybeast.myapplication.R;
 
@@ -16,6 +27,10 @@ public class ProcessVoiceActivity extends AppCompatActivity {
     private ProgressBar mProgress;
     private File voiceFile;
     private File resultFile;
+    private Thread worker;
+    private Thread progressThread;
+    private boolean continueWorking;
+    private int progress = 0;//TODO Progress bar
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -24,6 +39,52 @@ public class ProcessVoiceActivity extends AppCompatActivity {
         voiceFile = new File(getIntent().getStringExtra(BrowseRecordingsActivity.EXTRA_VOICE_FILE));
         mProgress = findViewById(R.id.progressBar);
         resultFile = NoteEditActivity.getNewFile(BrowseNotesActivity.getDefaultFolder(this), DEFAULT_FILE_NAME, NoteEditActivity.NOTE_FILE_SUFFIX);
+        worker = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    process();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        progressThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                mProgress.setProgress(progress);
+                try {
+                    Thread.sleep(30);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        continueWorking = true;
+        worker.start();
+        progressThread.start();
+    }
+    public void process() throws IOException {
+        DataInputStream in = new DataInputStream(new FileInputStream(voiceFile));
+        DataOutputStream out = new DataOutputStream(new FileOutputStream(resultFile));
+        NoteEditActivity.writeString(out, getDefaultTitle());
+        int bufferSize= Math.max(4096, AudioTrack.getMinBufferSize(RecordSoundNoteActivity.SAMPLE_RATE, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT));
+        AudioTrack audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC, RecordSoundNoteActivity.SAMPLE_RATE, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT, bufferSize, AudioTrack.MODE_STREAM);
+        audioTrack.play();
+        byte[] buffer = new byte[bufferSize/4];
+        while (continueWorking && in.available() > 0)
+        {
+            int amountRead = in.read(buffer);
+            audioTrack.write(buffer, 0, amountRead);
+        }
+        audioTrack.pause();
+        audioTrack.release();
+        out.flush();
+        out.close();
+        if (in.available() <= 0)
+        {
+            doneProcessing();
+        }
     }
     public void doneProcessing()
     {
@@ -32,13 +93,28 @@ public class ProcessVoiceActivity extends AppCompatActivity {
         setResult(Activity.RESULT_OK, returnIntent);
         finish();
     }
+    public String getDefaultTitle()
+    {
+        final String DEFAULT_TITLE = "Note From Voice";
+        return DEFAULT_TITLE;
+    }
+    public void interruptStop()
+    {
+        continueWorking = false;
+        try {
+            worker.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        Intent returnIntent = new Intent();
+        setResult(Activity.RESULT_CANCELED, returnIntent);
+        finish();
+    }
     @Override
     public void onBackPressed()
     {
-        //TODO Dialogg?
-        Intent returnIntent = new Intent();
-        setResult(Activity.RESULT_CANCELED, returnIntent);
+        //TODO Dialog?
+        interruptStop();
         super.onBackPressed();
-        finish();
     }
 }
