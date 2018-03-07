@@ -60,6 +60,7 @@ public class ProcessVoiceActivity extends AppCompatActivity {
                 }
             }
         });
+        mProgress.setMax((int) voiceFile.length());
         continueWorking = true;
         worker.start();
         progressThread.start();
@@ -72,10 +73,16 @@ public class ProcessVoiceActivity extends AppCompatActivity {
         AudioTrack audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC, RecordSoundNoteActivity.SAMPLE_RATE, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT, bufferSize, AudioTrack.MODE_STREAM);
         audioTrack.play();
         byte[] buffer = new byte[bufferSize/4];
+        short[] shorts = new short[buffer.length/2];
         while (continueWorking && in.available() > 0)
         {
             int amountRead = in.read(buffer);
-            audioTrack.write(buffer, 0, amountRead);
+            for (int i = 0; i < amountRead/2; i++) {
+                shorts[i] = (short)(( buffer[i*2] & 0xff )|( buffer[i*2 + 1] << 8 ));
+            }
+            //TODO Display process
+            audioTrack.write(shorts, 0, amountRead/2);
+            progress += amountRead;
         }
         audioTrack.pause();
         audioTrack.release();

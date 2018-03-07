@@ -15,32 +15,46 @@ import twangybeast.myapplication.R;
  * Created by cHeNdAn19 on 3/6/2018.
  */
 
-public class NewFolderDialog extends DialogFragment {
-    public static final String TAG = "NewFolderDialog";
-    public interface NewFolderListener
+public class MoveItemDialog extends DialogFragment {
+    public static final String TAG = "MoveItemDialog";
+    public interface MoveListener
     {
-        public void onNewFolderDialogPositiveClick(DialogFragment dialog);
-        public void onNewFolderDialogNegativeClick(DialogFragment dialog);
+        public void onMoverDialogPositiveClick(DialogFragment dialog);
+        public void onMoveDialogNegativeClick(DialogFragment dialog);
     }
-    private NewFolderListener mListener;
+    private MoveListener mListener;
+    private String[] stringArray;
+    public boolean[] selected;
+    public MoveItemDialog(String[] stringArray) {
+        //TODO FIX
+        super();
+        this.stringArray = stringArray;
+        selected = new boolean[stringArray.length];
+    }
+
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState)
     {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
         builder.setTitle(R.string.title_new_folder_dialog);
-        builder.setView(inflater.inflate(R.layout.dialog_new_folder, null))
+        builder.setMultiChoiceItems(stringArray, null, new DialogInterface.OnMultiChoiceClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                selected[which] = isChecked;
+            }
+        })
                 .setPositiveButton(R.string.button_create_folder, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        mListener.onNewFolderDialogPositiveClick(NewFolderDialog.this);
+                        mListener.onMoverDialogPositiveClick(MoveItemDialog.this);
                         dialog.dismiss();
                     }
                 })
                 .setNegativeButton(R.string.button_cancel, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        mListener.onNewFolderDialogNegativeClick(NewFolderDialog.this);
+                        mListener.onMoverDialogPositiveClick(MoveItemDialog.this);
                         dialog.dismiss();
                     }
                 });
@@ -53,7 +67,7 @@ public class NewFolderDialog extends DialogFragment {
         super.onAttach(activity);
         try
         {
-            mListener = (NewFolderListener) activity;
+            mListener = (MoveListener) activity;
         } catch (ClassCastException e)
         {
             Log.e(TAG, "Could not cast activity to listener");

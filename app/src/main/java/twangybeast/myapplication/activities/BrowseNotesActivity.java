@@ -1,8 +1,10 @@
 package twangybeast.myapplication.activities;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Vibrator;
+import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -12,13 +14,18 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
+
 import twangybeast.myapplication.R;
 import twangybeast.myapplication.adapters.NoteFileAdapter;
+import twangybeast.myapplication.fragments.NewFolderDialog;
+import twangybeast.myapplication.models.NoteFile;
 
 import java.io.*;
 
-public class BrowseNotesActivity extends AppCompatActivity
+public class BrowseNotesActivity extends AppCompatActivity implements NewFolderDialog.NewFolderListener
 {//TODO categories
     public static final String TAG = "BrowseNotesActivity";
     public static final String EXTRA_BROWSING_DIRECTORY = "BrowsingDirectory";
@@ -56,9 +63,17 @@ public class BrowseNotesActivity extends AppCompatActivity
                 }
                 else
                 {
-                    Intent intent = new Intent(BrowseNotesActivity.this, NoteEditActivity.class);//TODO differentiate file vs directory
-                    intent.putExtra(NoteEditActivity.EXTRA_NOTE_FILE_NAME, mAdapter.getFilePath(position));
-                    startActivity(intent);
+                    if (mAdapter.mData.get(position) instanceof NoteFile) {
+                        Intent intent = new Intent(BrowseNotesActivity.this, NoteEditActivity.class);
+                        intent.putExtra(NoteEditActivity.EXTRA_NOTE_FILE_NAME, mAdapter.getFilePath(position));
+                        startActivity(intent);
+                    }
+                    else
+                    {
+                        Intent intent = new Intent(BrowseNotesActivity.this, BrowseNotesActivity.class);
+                        intent.putExtra(BrowseNotesActivity.EXTRA_BROWSING_DIRECTORY, mAdapter.getFilePath(position));
+                        startActivity(intent);
+                    }
                 }
             }
         });
@@ -114,9 +129,33 @@ public class BrowseNotesActivity extends AppCompatActivity
     }
     public void newFolder()
     {
+        DialogFragment dialogFragment = new NewFolderDialog();
+        dialogFragment.show(getSupportFragmentManager(), "NewFolderDialog");
         //TODO
         //TODO Disallow same endings as notes
     }
+    public void onNewFolderDialogPositiveClick(DialogFragment dialogFragment)
+    {
+        Dialog dialog = dialogFragment.getDialog();
+        EditText editText = dialog.findViewById(R.id.editTextNewFolderName);
+        String folder = editText.getText().toString();
+        if (!folder.endsWith(NoteEditActivity.NOTE_FILE_SUFFIX))
+        {
+            File file = new File(mDir, folder);
+            if (!file.exists())
+            {
+                file.mkdir();
+                mAdapter.updateFiles(mDir.listFiles());
+                return;
+            }
+        }
+        Toast toast = Toast.makeText(this, R.string.toast_invalid_folder_name, Toast.LENGTH_SHORT);
+        toast.show();
+    };
+    public void onNewFolderDialogNegativeClick(DialogFragment dialog)
+    {
+        //Does nothing on negative click
+    };
     public void move()
     {
         //TODO
