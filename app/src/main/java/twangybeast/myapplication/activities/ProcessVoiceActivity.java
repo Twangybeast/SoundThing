@@ -21,6 +21,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import twangybeast.myapplication.R;
+import twangybeast.myapplication.soundAnalysis.AudioAnalysis;
+import twangybeast.myapplication.views.WaveformView;
 
 public class ProcessVoiceActivity extends AppCompatActivity {
     public static final String DEFAULT_FILE_NAME = "Voice Note";
@@ -31,11 +33,13 @@ public class ProcessVoiceActivity extends AppCompatActivity {
     private Thread progressThread;
     private boolean continueWorking;
     private int progress = 0;//TODO Progress bar
+    private WaveformView waveform;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_process_voice);
 
+        waveform = findViewById(R.id.WaveViewProcess);
         voiceFile = new File(getIntent().getStringExtra(BrowseRecordingsActivity.EXTRA_VOICE_FILE));
         mProgress = findViewById(R.id.progressBar);
         resultFile = NoteEditActivity.getNewFile(BrowseNotesActivity.getDefaultFolder(this), DEFAULT_FILE_NAME, NoteEditActivity.NOTE_FILE_SUFFIX);
@@ -81,6 +85,8 @@ public class ProcessVoiceActivity extends AppCompatActivity {
                 shorts[i] = (short)(( buffer[i*2] & 0xff )|( buffer[i*2 + 1] << 8 ));
             }
             //TODO Display process
+            float[] floats = AudioAnalysis.toFloatArray(shorts, RecordSoundNoteActivity.MAX_AMPLITUDE, amountRead/2);
+            waveform.updateAudioData(floats);
             audioTrack.write(shorts, 0, amountRead/2);
             progress += amountRead;
         }

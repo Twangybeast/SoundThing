@@ -17,47 +17,41 @@ import twangybeast.myapplication.R;
 
 public class MoveItemDialog extends DialogFragment {
     public static final String TAG = "MoveItemDialog";
+    private static final String ITEM_KEY = "moveDialogItemKey";
     public interface MoveListener
     {
-        public void onMoverDialogPositiveClick(DialogFragment dialog);
-        public void onMoveDialogNegativeClick(DialogFragment dialog);
+        public void onMoverDialogOnClick(DialogFragment dialog, int which);
     }
     private MoveListener mListener;
-    private String[] stringArray;
+    private String[] strings;
     public boolean[] selected;
-    public MoveItemDialog(String[] stringArray) {
+    public static MoveItemDialog newInstance(String[] stringArray) {
         //TODO FIX
-        super();
-        this.stringArray = stringArray;
-        selected = new boolean[stringArray.length];
+        MoveItemDialog dialog = new MoveItemDialog();
+        Bundle args = new Bundle();
+        args.putStringArray(ITEM_KEY, stringArray);
+        dialog.setArguments(args);
+        return dialog;
     }
+    @Override
+    public void onCreate(Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+        strings = getArguments().getStringArray(ITEM_KEY);
+        selected = new boolean[strings.length];
 
+    }
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState)
     {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        LayoutInflater inflater = getActivity().getLayoutInflater();
         builder.setTitle(R.string.title_new_folder_dialog);
-        builder.setMultiChoiceItems(stringArray, null, new DialogInterface.OnMultiChoiceClickListener() {
+        builder.setItems(strings, new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-                selected[which] = isChecked;
+            public void onClick(DialogInterface dialog, int which) {
+                mListener.onMoverDialogOnClick(MoveItemDialog.this, which);
             }
-        })
-                .setPositiveButton(R.string.button_create_folder, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        mListener.onMoverDialogPositiveClick(MoveItemDialog.this);
-                        dialog.dismiss();
-                    }
-                })
-                .setNegativeButton(R.string.button_cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        mListener.onMoverDialogPositiveClick(MoveItemDialog.this);
-                        dialog.dismiss();
-                    }
-                });
+        });
 
         return builder.create();
     }

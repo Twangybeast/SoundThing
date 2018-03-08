@@ -24,4 +24,5 @@
     <string name="button_create_folder">Create</string>
     <string name="button_cancel">Cancel</string>
     <string name="toast_invalid_folder_name">Invalid Folder Name! Not making folder...</string>
+    <string name="item_parent_folder">Parent</string>
 </resources>

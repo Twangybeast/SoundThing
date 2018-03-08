@@ -20,15 +20,23 @@ import android.widget.Toast;
 
 import twangybeast.myapplication.R;
 import twangybeast.myapplication.adapters.NoteFileAdapter;
+import twangybeast.myapplication.fragments.MoveItemDialog;
 import twangybeast.myapplication.fragments.NewFolderDialog;
+import twangybeast.myapplication.models.FileItem;
 import twangybeast.myapplication.models.NoteFile;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.LinkedList;
 
-public class BrowseNotesActivity extends AppCompatActivity implements NewFolderDialog.NewFolderListener
+public class BrowseNotesActivity extends AppCompatActivity implements NewFolderDialog.NewFolderListener, MoveItemDialog.MoveListener
 {//TODO categories
     public static final String TAG = "BrowseNotesActivity";
     public static final String EXTRA_BROWSING_DIRECTORY = "BrowsingDirectory";
+    public static final String EXTRA_TOP_DIRECTORY = "isTopDirectory";
     public static final String MAIN_NOTE_FOLDER = "notes";
     private NoteFileAdapter mAdapter;
     private ListView mList;
@@ -36,6 +44,8 @@ public class BrowseNotesActivity extends AppCompatActivity implements NewFolderD
     private static final int NEW_FOLDER_ID = 104;
     private static final int MOVE_ID = 106;
     private File mDir;
+    private ArrayList<File> folders;
+    private boolean isTop;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -46,6 +56,7 @@ public class BrowseNotesActivity extends AppCompatActivity implements NewFolderD
         setSupportActionBar(toolbar);
 
         String directory = getIntent().getStringExtra(EXTRA_BROWSING_DIRECTORY);
+        isTop = getIntent().getBooleanExtra(EXTRA_TOP_DIRECTORY, true);
         mDir = new File(directory);
         mAdapter = new NoteFileAdapter(this, mDir.listFiles());
         mList = findViewById(R.id.layoutNotesList);
@@ -58,6 +69,10 @@ public class BrowseNotesActivity extends AppCompatActivity implements NewFolderD
                 if (mAdapter.mIsSelecting)
                 {
                     CheckBox checkBox = view.findViewById(R.id.checkboxNoteFile);
+                    if (checkBox == null)
+                    {
+                        checkBox = view.findViewById(R.id.checkboxFolder);
+                    }
                     checkBox.performClick();
                     mAdapter.select(position, checkBox.isChecked());
                 }
@@ -72,6 +87,7 @@ public class BrowseNotesActivity extends AppCompatActivity implements NewFolderD
                     {
                         Intent intent = new Intent(BrowseNotesActivity.this, BrowseNotesActivity.class);
                         intent.putExtra(BrowseNotesActivity.EXTRA_BROWSING_DIRECTORY, mAdapter.getFilePath(position));
+                        intent.putExtra(EXTRA_TOP_DIRECTORY, false);
                         startActivity(intent);
                     }
                 }
@@ -151,14 +167,70 @@ public class BrowseNotesActivity extends AppCompatActivity implements NewFolderD
         }
         Toast toast = Toast.makeText(this, R.string.toast_invalid_folder_name, Toast.LENGTH_SHORT);
         toast.show();
-    };
+    }
     public void onNewFolderDialogNegativeClick(DialogFragment dialog)
     {
         //Does nothing on negative click
-    };
+    }
     public void move()
     {
-        //TODO
+        LinkedList<String> folderList = new LinkedList<>();
+        folders = new ArrayList<>();
+        if (!isTop) {
+            folderList.add(getResources().getString(R.string.item_parent_folder));
+            folders.add(mDir.getParentFile());
+        }
+        for (File file : mDir.listFiles())
+        {
+            if (file.exists() && file.isDirectory())
+            {
+                folderList.add(file.getName());
+                folders.add(file);
+            }
+        }
+        MoveItemDialog dialog = MoveItemDialog.newInstance(folderList.toArray(new String[folderList.size()]));
+        dialog.show(getSupportFragmentManager(), "MoveItemDialog");
+    }
+    public void onMoverDialogOnClick(DialogFragment dialog, int which)
+    {
+        File targetFolder = folders.get(which);
+        for (int i =0;i<mAdapter.getCount();i++)
+        {
+            FileItem item = mAdapter.mData.get(i);
+            if (item.isSelected)
+            {
+                moveFile(new File(mAdapter.getFilePath(i)), targetFolder);
+            }
+        }
+        mAdapter.updateFiles(mDir.listFiles());
+        stopSelecting();
+    }
+    public static void moveFile(File source, File target)
+    {
+        if (source.exists()) {
+            if (source.isDirectory()) {
+                File child = new File(target, source.getName());
+                child.mkdir();
+                for (File file : source.listFiles())
+                {
+                    moveFile(file, child);
+                }
+                source.delete();
+            }
+            if (source.isFile()) {
+                String name = source.getName();
+                int index = name.lastIndexOf(".");
+                File newFile;
+                if (index == -1)
+                {
+                    newFile = NoteEditActivity.getNewFile(target, name, "");
+                }
+                else {
+                    newFile = NoteEditActivity.getNewFile(target, name.substring(0, index), name.substring(index + 1));
+                }
+                source.renameTo(newFile);
+            }
+        }
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
@@ -170,6 +242,18 @@ public class BrowseNotesActivity extends AppCompatActivity implements NewFolderD
     @Override
     public boolean onPrepareOptionsMenu(Menu menu)
     {
+        if (menu.findItem(NEW_FOLDER_ID) == null)
+        {
+            final MenuItem newFolder = menu.add(Menu.NONE, NEW_FOLDER_ID, 1, R.string.action_new_folder);
+            newFolder.setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_NEVER);
+            newFolder.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+                    newFolder();
+                    return true;
+                }
+            });
+        }
         if (mAdapter.mIsSelecting)
         {
             if (menu.findItem(TRASH_ID) == null)
@@ -181,18 +265,6 @@ public class BrowseNotesActivity extends AppCompatActivity implements NewFolderD
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
                         delete();
-                        return true;
-                    }
-                });
-            }
-            if (menu.findItem(NEW_FOLDER_ID) == null)
-            {
-                final MenuItem newFolder = menu.add(Menu.NONE, NEW_FOLDER_ID, 1, R.string.action_new_folder);
-                newFolder.setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_NEVER);
-                newFolder.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        newFolder();
                         return true;
                     }
                 });
@@ -215,10 +287,6 @@ public class BrowseNotesActivity extends AppCompatActivity implements NewFolderD
             if (menu.findItem(TRASH_ID) != null)
             {
                 menu.removeItem(TRASH_ID);
-            }
-            if (menu.findItem(NEW_FOLDER_ID) != null)
-            {
-                menu.removeItem(NEW_FOLDER_ID);
             }
             if (menu.findItem(MOVE_ID) != null)
             {
