@@ -56,11 +56,13 @@ public class ProcessVoiceActivity extends AppCompatActivity {
         progressThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                mProgress.setProgress(progress);
-                try {
-                    Thread.sleep(30);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                while (continueWorking) {
+                    mProgress.setProgress(progress);
+                    try {
+                        Thread.sleep(30);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         });
@@ -82,11 +84,11 @@ public class ProcessVoiceActivity extends AppCompatActivity {
         {
             int amountRead = in.read(buffer);
             for (int i = 0; i < amountRead/2; i++) {
-                shorts[i] = (short)(( buffer[i*2] & 0xff )|( buffer[i*2 + 1] << 8 ));
+                shorts[i] = (short)(( buffer[i*2+1] & 0xff )|( buffer[i*2] << 8 ));
             }
-            //TODO Display process
             float[] floats = AudioAnalysis.toFloatArray(shorts, RecordSoundNoteActivity.MAX_AMPLITUDE, amountRead/2);
             waveform.updateAudioData(floats);
+            waveform.updateDisplay();
             audioTrack.write(shorts, 0, amountRead/2);
             progress += amountRead;
         }

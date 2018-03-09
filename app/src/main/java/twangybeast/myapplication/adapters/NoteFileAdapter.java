@@ -35,7 +35,7 @@ public class NoteFileAdapter extends BaseAdapter
     Context mContext;
     public ArrayList<FileItem> mData;
     LayoutInflater mInflater;
-    File[] mFiles;
+    public File[] mFiles;
     public boolean mIsSelecting;
     public NoteFileAdapter(Context context, File[] files)
     {
@@ -122,7 +122,7 @@ public class NoteFileAdapter extends BaseAdapter
         for (int i = 0; i < mData.size(); i++) {
             if (mData.get(i).isSelected)
             {
-                mFiles[i].delete();
+                FileNoteManager.delete(mFiles[i]);
             }
         }
     }

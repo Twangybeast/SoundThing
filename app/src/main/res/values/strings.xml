@@ -25,4 +25,9 @@
     <string name="button_cancel">Cancel</string>
     <string name="toast_invalid_folder_name">Invalid Folder Name! Not making folder...</string>
     <string name="item_parent_folder">Parent</string>
+    <string name="toast_no_folder_available">No folder to move to!</string>
+    <string name="title_move_dialog">Move Selected</string>
+    <string name="title_voice_action_dialog">Select Action for File</string>
+    <string name="text_play_file">Play file</string>
+    <string name="text_process_file">Process file</string>
 </resources>

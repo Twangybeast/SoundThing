@@ -147,8 +147,6 @@ public class BrowseNotesActivity extends AppCompatActivity implements NewFolderD
     {
         DialogFragment dialogFragment = new NewFolderDialog();
         dialogFragment.show(getSupportFragmentManager(), "NewFolderDialog");
-        //TODO
-        //TODO Disallow same endings as notes
     }
     public void onNewFolderDialogPositiveClick(DialogFragment dialogFragment)
     {
@@ -180,13 +178,20 @@ public class BrowseNotesActivity extends AppCompatActivity implements NewFolderD
             folderList.add(getResources().getString(R.string.item_parent_folder));
             folders.add(mDir.getParentFile());
         }
-        for (File file : mDir.listFiles())
+        for (int i =0; i<mAdapter.mFiles.length;i++)
         {
-            if (file.exists() && file.isDirectory())
+            File file = mAdapter.mFiles[i];
+            if (file.exists() && file.isDirectory() && !mAdapter.mData.get(i).isSelected)
             {
                 folderList.add(file.getName());
                 folders.add(file);
             }
+        }
+        if (folderList.size() == 0)
+        {
+            Toast toast = Toast.makeText(this, R.string.toast_no_folder_available, Toast.LENGTH_SHORT);
+            toast.show();
+            return;
         }
         MoveItemDialog dialog = MoveItemDialog.newInstance(folderList.toArray(new String[folderList.size()]));
         dialog.show(getSupportFragmentManager(), "MoveItemDialog");

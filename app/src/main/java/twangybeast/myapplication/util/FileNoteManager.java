@@ -26,4 +26,17 @@ public class FileNoteManager
             e.printStackTrace();
         }
     }
+    public static void delete(File root)
+    {
+        if (root.exists()) {
+            if (root.isDirectory())
+            {
+                for (File child : root.listFiles())
+                {
+                    delete(child);
+                }
+            }
+            root.delete();
+        }
+    }
 }

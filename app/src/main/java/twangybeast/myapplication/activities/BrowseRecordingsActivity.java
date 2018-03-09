@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Vibrator;
+import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -19,8 +20,9 @@ import java.io.File;
 
 import twangybeast.myapplication.R;
 import twangybeast.myapplication.adapters.RecordingFileAdapter;
+import twangybeast.myapplication.fragments.VoiceActionDialog;
 
-public class BrowseRecordingsActivity extends AppCompatActivity {
+public class BrowseRecordingsActivity extends AppCompatActivity implements VoiceActionDialog.VoiceActionListener{
 
     public static final String MAIN_RECORDING_FOLDER = "recordings";
     public static final String TAG = "BrowseRecordingsActivity";
@@ -54,9 +56,10 @@ public class BrowseRecordingsActivity extends AppCompatActivity {
                 }
                 else
                 {
-                    Intent intent = new Intent(BrowseRecordingsActivity.this, ProcessVoiceActivity.class);
-                    intent.putExtra(EXTRA_VOICE_FILE, mAdapter.getFilePath(position));
-                    startActivityForResult(intent, REQUEST_PROCESS);
+                    //TODO Make dialog
+                    VoiceActionDialog dialog = new VoiceActionDialog();
+                    dialog.position = position;
+                    dialog.show(getSupportFragmentManager(), "VoiceActionDialog");
                 }
             }
         });
@@ -72,6 +75,22 @@ public class BrowseRecordingsActivity extends AppCompatActivity {
                 return !alreadySelecting;
             }
         });
+    }
+    @Override
+    public void onVoiceActionSelectionClick(DialogFragment dialog, int which)
+    {
+        switch (which)
+        {
+            //Play file
+            case 0:
+                break;
+            //Prcess voice
+            case 1:
+                Intent intent = new Intent(BrowseRecordingsActivity.this, ProcessVoiceActivity.class);
+                intent.putExtra(EXTRA_VOICE_FILE, mAdapter.getFilePath(((VoiceActionDialog)dialog).position));
+                startActivityForResult(intent, REQUEST_PROCESS);
+                break;
+        }
     }
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data)
