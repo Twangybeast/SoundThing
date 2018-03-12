@@ -26,7 +26,8 @@
         <activity android:name=".activities.NoteEditActivity" />
         <activity android:name=".activities.BrowseNotesActivity" />
         <activity android:name=".activities.BrowseRecordingsActivity" />
-        <activity android:name=".activities.ProcessVoiceActivity"></activity>
+        <activity android:name=".activities.ProcessVoiceActivity" />
+        <activity android:name=".activities.PlayVoiceActivity"></activity>
     </application>
 
 </manifest>

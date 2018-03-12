@@ -82,7 +82,9 @@ public class BrowseRecordingsActivity extends AppCompatActivity implements Voice
         {
             //Play file
             case 0:
-                //TODO Play file/process
+                Intent playIntent= new Intent(BrowseRecordingsActivity.this, PlayVoiceActivity.class);
+                playIntent.putExtra(EXTRA_VOICE_FILE, mAdapter.getFilePath(((VoiceActionDialog)dialog).position));
+                startActivity(playIntent);
                 break;
             //Prcess voice
             case 1:

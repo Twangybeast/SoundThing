@@ -17,7 +17,7 @@ import java.util.Queue;
  */
 public class WaveformView extends SurfaceView implements SurfaceHolder.Callback
 {
-
+    //TODO Separate waveform view into 2 different views
     Queue<float[]> rawHistory;
     Complex[] fourier;
     public static final int MAX_HISTORY = 20;
@@ -90,7 +90,6 @@ public class WaveformView extends SurfaceView implements SurfaceHolder.Callback
         float width = getWidth();
         float height = getHeight() / 4;
         float yCenter = height;
-        int bufferIndex = 0;
         int pixelX = 0;
         float lastX = -1;
         float lastY = 0;
@@ -111,30 +110,27 @@ public class WaveformView extends SurfaceView implements SurfaceHolder.Callback
                     lastY = y;
                     pixelX++;
                 }
-                bufferIndex++;
             }
         }
-        yCenter = height * 3;
-        paint.setColor(Color.GRAY);
-        canvas.drawLine(0, yCenter, width, yCenter, paint);
-        paint.setColor(Color.GREEN);
-        drawFourier(canvas, fourier, paint, width, height, yCenter, new FloatFromComplex()
-        {
-            @Override
-            public float getValue(Complex c)
-            {
-                return c.a;
-            }
-        });
-        paint.setColor(Color.BLUE);
-        drawFourier(canvas, fourier, paint, width, height, yCenter, new FloatFromComplex()
-        {
-            @Override
-            public float getValue(Complex c)
-            {
-                return c.b;
-            }
-        });
+        if (fourier != null) {
+            yCenter = height * 3;
+            paint.setColor(Color.GRAY);
+            canvas.drawLine(0, yCenter, width, yCenter, paint);
+            paint.setColor(Color.GREEN);
+            drawFourier(canvas, fourier, paint, width, height, yCenter, new FloatFromComplex() {
+                @Override
+                public float getValue(Complex c) {
+                    return c.a;
+                }
+            });
+            paint.setColor(Color.BLUE);
+            drawFourier(canvas, fourier, paint, width, height, yCenter, new FloatFromComplex() {
+                @Override
+                public float getValue(Complex c) {
+                    return c.b;
+                }
+            });
+        }
     }
 
     public static void drawFourier(Canvas canvas, Complex[] fourier, Paint paint, float width, float height, float yCenter, FloatFromComplex func)

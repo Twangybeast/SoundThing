@@ -17,7 +17,12 @@ public class AudioAnalysis
         }
         return out;
     }
-
+    public static void toFloatArray(short[] src, float[] target, float max, int N)
+    {
+        for (int i = 0; i < N; i++) {
+            target[i] = (float) src[i] / max;
+        }
+    }
     public static void restrictFloatArray(float[] in, float max)
     {
         for (int i = 0; i < in.length; i++)
@@ -90,16 +95,6 @@ public class AudioAnalysis
             a[i + n / 2 + index] = b[i];
         }
         b = null;
-    }
-
-    public static Complex[] getUpperHalf(Complex[] in)
-    {
-        Complex[] upper = new Complex[in.length / 2];
-        for (int i = 0; i < upper.length; i++)
-        {
-            upper[i] = in[i + upper.length / 2];
-        }
-        return upper;
     }
     public static Complex[] getRange(Complex[] in, int i, int length)
     {
