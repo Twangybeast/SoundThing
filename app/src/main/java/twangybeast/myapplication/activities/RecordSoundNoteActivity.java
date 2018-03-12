@@ -1,34 +1,26 @@
 package twangybeast.myapplication.activities;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Process;
-import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import twangybeast.myapplication.R;
 import twangybeast.myapplication.soundAnalysis.AudioAnalysis;
 import twangybeast.myapplication.soundAnalysis.Complex;
-import twangybeast.myapplication.R;
 import twangybeast.myapplication.views.WaveformView;
 
-import java.io.BufferedOutputStream;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 
 public class RecordSoundNoteActivity extends AppCompatActivity
 {
     File file;
-    public static final String VOICE_FILE_NAME= "Voice Note ";
+    public static final String VOICE_FILE_NAME = "Voice Note ";
     public static final String VOICE_FILE_SUFFIX = ".pcm";
     public static int SAMPLE_RATE = new int[]{16000, 44100}[0];
     public static int CHANNEL = AudioFormat.CHANNEL_CONFIGURATION_MONO;
@@ -43,28 +35,33 @@ public class RecordSoundNoteActivity extends AppCompatActivity
     TextView time;
     WaveformView waveView;
     float[] displayArr = null;
-    int currentTime=0;
+    int currentTime = 0;
+    DataOutputStream out;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_record_sound_note);
         isRecording = false;
+        out = null;
         chooseSoundFile();
         bufferSize = AudioRecord.getMinBufferSize(SAMPLE_RATE, CHANNEL, ENCODING);
         bufferSize = Math.max(4096, bufferSize);
         time = findViewById(R.id.textSoundLength);
         waveView = findViewById(R.id.WaveView);
     }
+
     public static String getSoundDirectory(Context context)
     {
-        File file = new File(context.getExternalFilesDir(null)+File.separator+BrowseRecordingsActivity.MAIN_RECORDING_FOLDER);
+        File file = new File(context.getExternalFilesDir(null) + File.separator + BrowseRecordingsActivity.MAIN_RECORDING_FOLDER);
         if (!file.exists() || !file.isDirectory())
         {
             file.mkdir();
         }
         return file.getAbsolutePath();
     }
+
     public void chooseSoundFile()
     {
         int i = 1;
@@ -75,19 +72,26 @@ public class RecordSoundNoteActivity extends AppCompatActivity
         }
         while (file.exists());
     }
+
     public static int getSecondsFromBytes(long bytes)
     {
-        return (int) ((bytes/2)/SAMPLE_RATE);
+        return (int) ((bytes / 2) / SAMPLE_RATE);
     }
+
     public void recordBytes()
     {
         short[] data = new short[bufferSize / 2];
         displayArr = new float[data.length];
-        DataOutputStream out = null;
-        try {
-            out = new DataOutputStream(new FileOutputStream(file));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+        if (out == null)
+        {
+            try
+            {
+                out = new DataOutputStream(new FileOutputStream(file));
+            }
+            catch (FileNotFoundException e)
+            {
+                e.printStackTrace();
+            }
         }
         while (isRecording)
         {
@@ -96,17 +100,14 @@ public class RecordSoundNoteActivity extends AppCompatActivity
             writeBytes(out, data, amountRead);
             processTime(amountRead);
         }
-        try {
-            out.flush();
-            out.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
+
     public static void writeBytes(DataOutputStream out, short[] data, int amount)
     {
-        try {
-            for (int i = 0; i < amount; i++) {
+        try
+        {
+            for (int i = 0; i < amount; i++)
+            {
                 out.writeShort(data[i]);
             }
         }
@@ -115,6 +116,7 @@ public class RecordSoundNoteActivity extends AppCompatActivity
             e.printStackTrace();
         }
     }
+
     public void updateBytesToDisplay(short[] in, int amount)
     {
         displayArr = AudioAnalysis.toFloatArray(in, MAX_AMPLITUDE, amount);
@@ -128,8 +130,8 @@ public class RecordSoundNoteActivity extends AppCompatActivity
         Complex[] fourier = new Complex[N];
         AudioAnalysis.calculateFourier(data, fourier, N);
         //fourier = AudioAnalysis.getUpperHalf(fourier);
-        fourier = AudioAnalysis.getRange(fourier, 0, (N/2)/8);
-        AudioAnalysis.restrictComplexArray(fourier, N/4);
+        fourier = AudioAnalysis.getRange(fourier, 0, (N / 2) / 8);
+        AudioAnalysis.restrictComplexArray(fourier, N / 4);
         waveView.updateFourierValues(fourier);
     }
 
@@ -249,6 +251,18 @@ public class RecordSoundNoteActivity extends AppCompatActivity
         if (isRecording)
         {
             pauseRecord();
+        }
+        if (out != null)
+        {
+            try
+            {
+                out.flush();
+                out.close();
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
         }
         finish();
     }
