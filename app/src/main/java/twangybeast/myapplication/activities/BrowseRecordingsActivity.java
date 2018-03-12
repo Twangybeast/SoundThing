@@ -56,7 +56,6 @@ public class BrowseRecordingsActivity extends AppCompatActivity implements Voice
                 }
                 else
                 {
-                    //TODO Make dialog
                     VoiceActionDialog dialog = new VoiceActionDialog();
                     dialog.position = position;
                     dialog.show(getSupportFragmentManager(), "VoiceActionDialog");
@@ -83,6 +82,7 @@ public class BrowseRecordingsActivity extends AppCompatActivity implements Voice
         {
             //Play file
             case 0:
+                //TODO Play file/process
                 break;
             //Prcess voice
             case 1:

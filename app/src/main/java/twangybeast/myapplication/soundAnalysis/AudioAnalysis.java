@@ -32,8 +32,6 @@ public class AudioAnalysis
             in[i] = in[i].divide(max);
         }
     }
-    //TODO REMOVE COMMENT
-    //See https://en.wikipedia.org/wiki/Cooley%E2%80%93Tukey_FFT_algorithm#C++_Example_Code
     public static void calculateFourier(float[] input, Complex[] data, int N)
     {
         for (int i = 0; i < N; i++)

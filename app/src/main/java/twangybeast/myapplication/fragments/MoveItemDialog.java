@@ -26,7 +26,6 @@ public class MoveItemDialog extends DialogFragment {
     private String[] strings;
     public boolean[] selected;
     public static MoveItemDialog newInstance(String[] stringArray) {
-        //TODO FIX
         MoveItemDialog dialog = new MoveItemDialog();
         Bundle args = new Bundle();
         args.putStringArray(ITEM_KEY, stringArray);

@@ -82,6 +82,7 @@ public class ProcessVoiceActivity extends AppCompatActivity {
         short[] shorts = new short[buffer.length/2];
         while (continueWorking && in.available() > 0)
         {
+            //TODO actually process
             int amountRead = in.read(buffer);
             for (int i = 0; i < amountRead/2; i++) {
                 shorts[i] = (short)(( buffer[i*2+1] & 0xff )|( buffer[i*2] << 8 ));

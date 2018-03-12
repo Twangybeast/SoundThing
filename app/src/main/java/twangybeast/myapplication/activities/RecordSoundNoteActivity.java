@@ -166,7 +166,6 @@ public class RecordSoundNoteActivity extends AppCompatActivity
     public void processTime(int amountRead)
     {
         totalRead += amountRead;
-        //TODO Mod and divide at same time
         if (totalRead >= SAMPLE_RATE)
         {
             currentTime += totalRead / SAMPLE_RATE;

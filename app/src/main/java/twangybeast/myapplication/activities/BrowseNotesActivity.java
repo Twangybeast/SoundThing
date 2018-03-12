@@ -33,7 +33,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class BrowseNotesActivity extends AppCompatActivity implements NewFolderDialog.NewFolderListener, MoveItemDialog.MoveListener
-{//TODO categories
+{
     public static final String TAG = "BrowseNotesActivity";
     public static final String EXTRA_BROWSING_DIRECTORY = "BrowsingDirectory";
     public static final String EXTRA_TOP_DIRECTORY = "isTopDirectory";
