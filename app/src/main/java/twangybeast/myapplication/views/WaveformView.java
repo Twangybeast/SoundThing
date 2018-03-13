@@ -19,6 +19,7 @@ public class WaveformView extends SurfaceView implements SurfaceHolder.Callback
 {
     //TODO Separate waveform view into 2 different views
     Queue<float[]> rawHistory;
+    Queue<float[]> fourierHistory;
     Complex[] fourier;
     public static final int MAX_HISTORY = 20;
 
@@ -48,7 +49,7 @@ public class WaveformView extends SurfaceView implements SurfaceHolder.Callback
         getHolder().addCallback(this);
     }
 
-    public void updateAudioData(float[] buffer)
+    public float[] updateAudioData(float[] buffer)
     {
         float[] newBuffer;
         synchronized (rawHistory)
@@ -64,6 +65,7 @@ public class WaveformView extends SurfaceView implements SurfaceHolder.Callback
             }
 
             rawHistory.offer(newBuffer);
+            return newBuffer;
         }
     }
 

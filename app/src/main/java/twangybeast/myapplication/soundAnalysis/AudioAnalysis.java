@@ -96,7 +96,7 @@ public class AudioAnalysis
         }
         b = null;
     }
-    public static Complex[] getRange(Complex[] in, int i, int length)
+    public static Complex[] getRange(Complex[] in, int i, int length)//TODO Don't make new array
     {
         Complex[] res = new Complex[length];
         System.arraycopy(in, i, res, 0, length);

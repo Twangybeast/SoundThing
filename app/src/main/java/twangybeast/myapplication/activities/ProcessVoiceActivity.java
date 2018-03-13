@@ -8,6 +8,7 @@ import android.media.AudioTrack;
 import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ProgressBar;
 
 import java.io.BufferedWriter;
@@ -19,14 +20,18 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.LinkedList;
 
 import twangybeast.myapplication.R;
 import twangybeast.myapplication.soundAnalysis.AudioAnalysis;
 import twangybeast.myapplication.soundAnalysis.Complex;
+import twangybeast.myapplication.soundAnalysis.WindowHelper;
 import twangybeast.myapplication.views.WaveformView;
 
 public class ProcessVoiceActivity extends AppCompatActivity {
     public static final String DEFAULT_FILE_NAME = "Voice Note";
+    public static final int FOURIER_RADIUS = 1024;
+    public static final int FOURIER_STEP = 512;
     private ProgressBar mProgress;
     private File voiceFile;
     private File resultFile;
@@ -77,10 +82,17 @@ public class ProcessVoiceActivity extends AppCompatActivity {
         DataOutputStream out = new DataOutputStream(new FileOutputStream(resultFile));
         NoteEditActivity.writeString(out, getDefaultTitle());
         int bufferSize= Math.max(4096, AudioTrack.getMinBufferSize(RecordSoundNoteActivity.SAMPLE_RATE, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT));
+        bufferSize += bufferSize % 2;//Make sure % 2 == 0
+        int sampleSize = bufferSize/2;
         byte[] buffer = new byte[bufferSize/4];
         short[] shorts = new short[buffer.length/2];
         float[] floats = new float[shorts.length];
-        Complex[] complexes = new Complex[shorts.length];
+        LinkedList<float[]> history = new LinkedList<>();
+        int currentPosition = 0;
+        final int N = Integer.highestOneBit(FOURIER_RADIUS * 2 + 1);
+        float[] windowed = new float[N];
+        Complex[] complexes = new Complex[N];
+        WindowHelper windowHelper = new WindowHelper(N);
         while (continueWorking && in.available() > 0)
         {
             //TODO actually process
@@ -90,12 +102,47 @@ public class ProcessVoiceActivity extends AppCompatActivity {
             }
             //TODO Use window function on fourier transform & with more resolution
             AudioAnalysis.toFloatArray(shorts, floats, RecordSoundNoteActivity.MAX_AMPLITUDE, amountRead/2);
-            waveform.updateAudioData(floats);
-            int N = Integer.highestOneBit(amountRead/2);
-            AudioAnalysis.calculateFourier(floats, complexes, N);
-            Complex[] fourier = AudioAnalysis.getRange(complexes, 0, (N/2)/4);
-            AudioAnalysis.restrictComplexArray(fourier, N/4);
-            waveform.updateFourierValues(fourier);
+            float[] historyItem = waveform.updateAudioData(floats);//Get float array from waveform to save memory
+            history.offer(historyItem);
+            while (currentPosition - FOURIER_RADIUS + N < history.size() * sampleSize)
+            {
+                int index = currentPosition - FOURIER_RADIUS;
+                int count = 0;
+                if (index < 0)
+                {
+                    count -= index;//Ensure positive
+                    index = 0;
+                }
+                SampleLoop:
+                for (float[] samples : history)
+                {
+                    for (; index < samples.length; index++) {
+                        if (samples[index] > 0.05f)
+                        {
+                            Log.d("asdf", samples[index]+"");
+                        }
+                        windowed[count] = samples[index] * windowHelper.getValue(count);
+                        count++;
+                        if (!(count < N))
+                        {
+                            break SampleLoop;
+                        }
+                    }
+                    index -= samples.length;
+                }
+                currentPosition += FOURIER_STEP;
+                AudioAnalysis.calculateFourier(windowed, complexes, N);
+                Complex[] fourier = AudioAnalysis.getRange(complexes, 0, (N/2)/4);
+                //AudioAnalysis.restrictComplexArray(fourier, N/4);
+                waveform.updateFourierValues(fourier);
+                waveform.updateDisplay();
+            }
+            if (currentPosition - FOURIER_RADIUS > sampleSize)
+            {
+                history.poll();
+                currentPosition -= sampleSize;
+            }
+
             waveform.updateDisplay();
             progress += amountRead;
         }
