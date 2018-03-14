@@ -19,8 +19,6 @@ public class WaveformView extends SurfaceView implements SurfaceHolder.Callback
 {
     //TODO Separate waveform view into 2 different views
     Queue<float[]> rawHistory;
-    Queue<float[]> fourierHistory;
-    Complex[] fourier;
     public static final int MAX_HISTORY = 20;
 
     public WaveformView(Context context)
@@ -45,7 +43,6 @@ public class WaveformView extends SurfaceView implements SurfaceHolder.Callback
     {
         setZOrderOnTop(true);
         rawHistory = new LinkedList<>();
-        fourier = null;
         getHolder().addCallback(this);
     }
 
@@ -79,18 +76,13 @@ public class WaveformView extends SurfaceView implements SurfaceHolder.Callback
         }
     }
 
-    public void updateFourierValues(Complex[] fourier)
-    {
-        this.fourier = fourier;
-    }
-
     public void drawAll(Canvas canvas)
     {
         canvas.drawColor(Color.WHITE);
         Paint paint = new Paint();
         paint.setColor(0xFFFF0000);
         float width = getWidth();
-        float height = getHeight() / 4;
+        float height = getHeight() / 2;
         float yCenter = height;
         int pixelX = 0;
         float lastX = -1;
@@ -114,64 +106,9 @@ public class WaveformView extends SurfaceView implements SurfaceHolder.Callback
                 }
             }
         }
-        if (fourier != null) {
-            yCenter = height * 3;
-            paint.setColor(Color.GRAY);
-            canvas.drawLine(0, yCenter, width, yCenter, paint);
-            paint.setColor(Color.GREEN);
-            drawFourier(canvas, fourier, paint, width, height, yCenter, new FloatFromComplex() {
-                @Override
-                public float getValue(Complex c) {
-                    return c.a;
-                }
-            });
-            paint.setColor(Color.BLUE);
-            drawFourier(canvas, fourier, paint, width, height, yCenter, new FloatFromComplex() {
-                @Override
-                public float getValue(Complex c) {
-                    return c.b;
-                }
-            });
-        }
     }
 
-    public static void drawFourier(Canvas canvas, Complex[] fourier, Paint paint, float width, float height, float yCenter, FloatFromComplex func)
-    {
-        float lastX = -1;
-        float lastY = 0;
-        if (fourier != null && fourier.length > 0)
-        {
-            if (fourier.length > width) {
-                for (int x = 0; x < width; x++) {
-                    int i = (int) ((x / width) * fourier.length);
-                    float y = (-func.getValue(fourier[i]) * height) + yCenter;
-                    if (lastX != -1) {
-                        canvas.drawLine(lastX, lastY, x, y, paint);
-                    }
-                    lastX = x;
-                    lastY = y;
-                }
-            }
-            else
-            {
-                for (int i = 0; i < fourier.length; i++) {
-                    int x = (int) ((i*1.0f /fourier.length) * width);
-                    float y = (-func.getValue(fourier[i]) * height) + yCenter;
-                    if (lastX != -1)
-                    {
-                        canvas.drawLine(lastX, lastY, x, y, paint);
-                    }
-                    lastX = x;
-                    lastY = y;
-                }
-            }
-        }
-    }
 
-    interface FloatFromComplex
-    {
-        public float getValue(Complex c);
-    }
 
     @Override
     public void surfaceCreated(SurfaceHolder holder)

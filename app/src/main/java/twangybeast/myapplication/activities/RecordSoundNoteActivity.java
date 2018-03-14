@@ -13,6 +13,7 @@ import android.widget.TextView;
 import twangybeast.myapplication.R;
 import twangybeast.myapplication.soundAnalysis.AudioAnalysis;
 import twangybeast.myapplication.soundAnalysis.Complex;
+import twangybeast.myapplication.views.FourierView;
 import twangybeast.myapplication.views.WaveformView;
 
 import java.io.*;
@@ -34,6 +35,7 @@ public class RecordSoundNoteActivity extends AppCompatActivity
     long totalRead = 0;
     TextView time;
     WaveformView waveView;
+    FourierView fourierView;
     float[] displayArr = null;
     int currentTime = 0;
     DataOutputStream out;
@@ -50,6 +52,7 @@ public class RecordSoundNoteActivity extends AppCompatActivity
         bufferSize = Math.max(4096, bufferSize);
         time = findViewById(R.id.textSoundLength);
         waveView = findViewById(R.id.WaveView);
+        fourierView = findViewById(R.id.FourierView);
     }
 
     public static String getSoundDirectory(Context context)
@@ -132,7 +135,7 @@ public class RecordSoundNoteActivity extends AppCompatActivity
         //fourier = AudioAnalysis.getUpperHalf(fourier);
         fourier = AudioAnalysis.getRange(fourier, 0, (N / 2) / 8);
         AudioAnalysis.restrictComplexArray(fourier, N / 4);
-        waveView.updateFourierValues(fourier);
+        fourierView.updateFourierValues(fourier);
     }
 
     public void runDisplayBytes()
@@ -152,6 +155,7 @@ public class RecordSoundNoteActivity extends AppCompatActivity
         {
             processBytes(displayArr, displayArr.length);
             waveView.updateDisplay();
+            fourierView.updateDisplay();
             try
             {
                 Thread.sleep(50);

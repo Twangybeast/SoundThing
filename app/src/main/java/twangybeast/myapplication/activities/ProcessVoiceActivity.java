@@ -6,6 +6,7 @@ import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
 import android.provider.ContactsContract;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -26,6 +27,8 @@ import twangybeast.myapplication.R;
 import twangybeast.myapplication.soundAnalysis.AudioAnalysis;
 import twangybeast.myapplication.soundAnalysis.Complex;
 import twangybeast.myapplication.soundAnalysis.WindowHelper;
+import twangybeast.myapplication.views.FourierHistoryView;
+import twangybeast.myapplication.views.FourierView;
 import twangybeast.myapplication.views.WaveformView;
 
 public class ProcessVoiceActivity extends AppCompatActivity {
@@ -40,12 +43,14 @@ public class ProcessVoiceActivity extends AppCompatActivity {
     private boolean continueWorking;
     private int progress = 0;
     private WaveformView waveform;
+    private FourierHistoryView fourierView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_process_voice);
 
         waveform = findViewById(R.id.WaveViewProcess);
+        fourierView = findViewById(R.id.FourierViewProcess);
         voiceFile = new File(getIntent().getStringExtra(BrowseRecordingsActivity.EXTRA_VOICE_FILE));
         mProgress = findViewById(R.id.progressBar);
         resultFile = NoteEditActivity.getNewFile(BrowseNotesActivity.getDefaultFolder(this), DEFAULT_FILE_NAME, NoteEditActivity.NOTE_FILE_SUFFIX);
@@ -83,7 +88,6 @@ public class ProcessVoiceActivity extends AppCompatActivity {
         NoteEditActivity.writeString(out, getDefaultTitle());
         int bufferSize= Math.max(4096, AudioTrack.getMinBufferSize(RecordSoundNoteActivity.SAMPLE_RATE, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT));
         bufferSize += bufferSize % 2;//Make sure % 2 == 0
-        int sampleSize = bufferSize/2;
         byte[] buffer = new byte[bufferSize/4];
         short[] shorts = new short[buffer.length/2];
         float[] floats = new float[shorts.length];
@@ -104,7 +108,7 @@ public class ProcessVoiceActivity extends AppCompatActivity {
             AudioAnalysis.toFloatArray(shorts, floats, RecordSoundNoteActivity.MAX_AMPLITUDE, amountRead/2);
             float[] historyItem = waveform.updateAudioData(floats);//Get float array from waveform to save memory
             history.offer(historyItem);
-            while (currentPosition - FOURIER_RADIUS + N < history.size() * sampleSize)
+            while (currentPosition - FOURIER_RADIUS + N < history.size() * shorts.length)
             {
                 int index = currentPosition - FOURIER_RADIUS;
                 int count = 0;
@@ -117,10 +121,6 @@ public class ProcessVoiceActivity extends AppCompatActivity {
                 for (float[] samples : history)
                 {
                     for (; index < samples.length; index++) {
-                        if (samples[index] > 0.05f)
-                        {
-                            Log.d("asdf", samples[index]+"");
-                        }
                         windowed[count] = samples[index] * windowHelper.getValue(count);
                         count++;
                         if (!(count < N))
@@ -132,15 +132,17 @@ public class ProcessVoiceActivity extends AppCompatActivity {
                 }
                 currentPosition += FOURIER_STEP;
                 AudioAnalysis.calculateFourier(windowed, complexes, N);
-                Complex[] fourier = AudioAnalysis.getRange(complexes, 0, (N/2)/4);
+                Complex[] fourier = AudioAnalysis.getRange(complexes, 0, (N/2)/8);
                 //AudioAnalysis.restrictComplexArray(fourier, N/4);
-                waveform.updateFourierValues(fourier);
-                waveform.updateDisplay();
+                AudioAnalysis.complexToFloat(fourier, windowed, fourier.length);
+                AudioAnalysis.restrictFloatArray(windowed, AudioAnalysis.getMax(windowed));
+                fourierView.updateFourierValues(windowed);
+                fourierView.updateDisplay();
             }
-            if (currentPosition - FOURIER_RADIUS > sampleSize)
+            if (currentPosition - FOURIER_RADIUS > shorts.length)
             {
                 history.poll();
-                currentPosition -= sampleSize;
+                currentPosition -= shorts.length;
             }
 
             waveform.updateDisplay();

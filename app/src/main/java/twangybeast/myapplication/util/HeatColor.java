@@ -18,7 +18,7 @@ public class HeatColor {
     {
         final int zones = colors.length-1;
         int index = Math.min(zones-1, (int) (Math.min(val, 1.0f)*zones));
-        return interpolate2Colors(val, colors[index], index *1.0f / zones, index+1, (index+1)*1.0f/zones);
+        return interpolate2Colors(val, colors[index], index *1.0f / zones, colors[index+1], (index+1)*1.0f/zones);
     }
     public static int interpolate2Colors(float val, int color1, float value1, int color2, float value2)
     {

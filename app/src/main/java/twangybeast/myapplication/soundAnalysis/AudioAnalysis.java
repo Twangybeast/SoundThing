@@ -8,6 +8,21 @@ import java.util.Arrays;
 
 public class AudioAnalysis
 {
+    public static float getMax(float[] floats)
+    {
+        float max = 0;
+        for (float f : floats)
+        {
+            max = Math.max(max, f);
+        }
+        return max;
+    }
+    public static void complexToFloat(Complex[] complex, float[] target, int N)
+    {
+        for (int i = 0; i < N; i++) {
+            target[i] = complex[i].getMag();
+        }
+    }
     public static float[] toFloatArray(short[] in, float max, int N)
     {
         float[] out = new float[N];
