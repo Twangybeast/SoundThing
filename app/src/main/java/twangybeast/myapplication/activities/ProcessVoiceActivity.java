@@ -136,7 +136,11 @@ public class ProcessVoiceActivity extends AppCompatActivity {
                 AudioAnalysis.getRange(complexes, ranged, 0, ranged.length);
                 //AudioAnalysis.restrictComplexArray(ranged, N/4);
                 AudioAnalysis.complexToFloat(ranged, fourier, fourier.length);
-                AudioAnalysis.restrictFloatArray(fourier, AudioAnalysis.getMax(fourier));//TODO Make maximum global
+                AudioAnalysis.restrictFloatArray(fourier, Math.max(N/16, AudioAnalysis.getMax(fourier)));//TODO Make maximum global
+                //https://kastnerkyle.github.io/posts/single-speaker-word-recognition-with-hidden-markov-models/
+                //https://dsp.stackexchange.com/questions/29165/speech-recognition-using-mfcc-and-dtwdynamic-time-warping
+                //http://www.fit.vutbr.cz/~grezl/ZRE/lectures/08_reco_dtw_en.pdf
+                //Use this?
                 fourierView.updateFourierValues(fourier);
                 fourierView.updateDisplay();
             }

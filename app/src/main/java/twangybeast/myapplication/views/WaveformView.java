@@ -17,7 +17,6 @@ import java.util.Queue;
  */
 public class WaveformView extends SurfaceView implements SurfaceHolder.Callback
 {
-    //TODO Separate waveform view into 2 different views
     Queue<float[]> rawHistory;
     public static final int MAX_HISTORY = 20;
 
