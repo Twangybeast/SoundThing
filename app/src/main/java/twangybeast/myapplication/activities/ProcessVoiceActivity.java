@@ -88,14 +88,16 @@ public class ProcessVoiceActivity extends AppCompatActivity {
         NoteEditActivity.writeString(out, getDefaultTitle());
         int bufferSize= Math.max(4096, AudioTrack.getMinBufferSize(RecordSoundNoteActivity.SAMPLE_RATE, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT));
         bufferSize += bufferSize % 2;//Make sure % 2 == 0
-        byte[] buffer = new byte[bufferSize/4];
-        short[] shorts = new short[buffer.length/2];
-        float[] floats = new float[shorts.length];
+        byte[] buffer = new byte[bufferSize/4];         //Byte array which bytes are initially read into
+        short[] shorts = new short[buffer.length/2];    //Short array where bytes are converted into
+        float[] floats = new float[shorts.length];      //float array where shorts are converted into
         LinkedList<float[]> history = new LinkedList<>();
         int currentPosition = 0;
         final int N = Integer.highestOneBit(FOURIER_RADIUS * 2 + 1);
-        float[] windowed = new float[N];
-        Complex[] complexes = new Complex[N];
+        float[] windowed = new float[N];                //Holds float values multiplied by window for fourier
+        Complex[] complexes = new Complex[N];           //Fourier result
+        Complex[] ranged = new Complex[(N/2)/4];        //Restricted range fourier result
+        float[] fourier = new float[ranged.length];//Final fourier to display
         WindowHelper windowHelper = new WindowHelper(N);
         while (continueWorking && in.available() > 0)
         {
@@ -104,7 +106,6 @@ public class ProcessVoiceActivity extends AppCompatActivity {
             for (int i = 0; i < amountRead/2; i++) {
                 shorts[i] = (short)(( buffer[i*2+1] & 0xff )|( buffer[i*2] << 8 ));
             }
-            //TODO Use window function on fourier transform & with more resolution
             AudioAnalysis.toFloatArray(shorts, floats, RecordSoundNoteActivity.MAX_AMPLITUDE, amountRead/2);
             float[] historyItem = waveform.updateAudioData(floats);//Get float array from waveform to save memory
             history.offer(historyItem);
@@ -132,11 +133,11 @@ public class ProcessVoiceActivity extends AppCompatActivity {
                 }
                 currentPosition += FOURIER_STEP;
                 AudioAnalysis.calculateFourier(windowed, complexes, N);
-                Complex[] fourier = AudioAnalysis.getRange(complexes, 0, (N/2)/8);
-                //AudioAnalysis.restrictComplexArray(fourier, N/4);
-                AudioAnalysis.complexToFloat(fourier, windowed, fourier.length);
-                AudioAnalysis.restrictFloatArray(windowed, AudioAnalysis.getMax(windowed));
-                fourierView.updateFourierValues(windowed);
+                AudioAnalysis.getRange(complexes, ranged, 0, ranged.length);
+                //AudioAnalysis.restrictComplexArray(ranged, N/4);
+                AudioAnalysis.complexToFloat(ranged, fourier, fourier.length);
+                AudioAnalysis.restrictFloatArray(fourier, AudioAnalysis.getMax(fourier));//TODO Make maximum global
+                fourierView.updateFourierValues(fourier);
                 fourierView.updateDisplay();
             }
             if (currentPosition - FOURIER_RADIUS > shorts.length)

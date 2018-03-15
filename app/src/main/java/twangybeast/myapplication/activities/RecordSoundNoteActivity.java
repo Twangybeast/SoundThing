@@ -133,9 +133,10 @@ public class RecordSoundNoteActivity extends AppCompatActivity
         Complex[] fourier = new Complex[N];
         AudioAnalysis.calculateFourier(data, fourier, N);
         //fourier = AudioAnalysis.getUpperHalf(fourier);
-        fourier = AudioAnalysis.getRange(fourier, 0, (N / 2) / 8);
-        AudioAnalysis.restrictComplexArray(fourier, N / 4);
-        fourierView.updateFourierValues(fourier);
+        Complex[] restricted = new Complex[(N/2)/8];
+        AudioAnalysis.getRange(fourier, restricted, 0, restricted.length);
+        AudioAnalysis.restrictComplexArray(restricted, N / 4);
+        fourierView.updateFourierValues(restricted);
     }
 
     public void runDisplayBytes()

@@ -62,8 +62,9 @@ public class FourierHistoryView extends SurfaceView implements SurfaceHolder.Cal
         paint.setColor(0xFFFF0000);
         float width = getWidth();
         int x = 0;
-        float xStep = width/(MAX_HISTORY+1);
+        float xStep = width/(MAX_HISTORY);
         float height = getHeight();
+        //TODO Efficient drawing
         synchronized (fourierHistory)
         {
             for (float[] fourier: fourierHistory)
