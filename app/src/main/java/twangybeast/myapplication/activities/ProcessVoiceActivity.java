@@ -33,7 +33,7 @@ import twangybeast.myapplication.views.WaveformView;
 
 public class ProcessVoiceActivity extends AppCompatActivity {
     public static final String DEFAULT_FILE_NAME = "Voice Note";
-    public static final int FOURIER_RADIUS = 1024;
+    public static final int FOURIER_RADIUS = 256;
     public static final int FOURIER_STEP = 512;
     private ProgressBar mProgress;
     private File voiceFile;
@@ -96,9 +96,10 @@ public class ProcessVoiceActivity extends AppCompatActivity {
         final int N = Integer.highestOneBit(FOURIER_RADIUS * 2 + 1);
         float[] windowed = new float[N];                //Holds float values multiplied by window for fourier
         Complex[] complexes = new Complex[N];           //Fourier result
-        Complex[] ranged = new Complex[(N/2)/4];        //Restricted range fourier result
+        Complex[] ranged = new Complex[(N/2)];        //Restricted range fourier result
         float[] fourier = new float[ranged.length];//Final fourier to display
         WindowHelper windowHelper = new WindowHelper(N);
+        int[] filterFreqIndexes = AudioAnalysis.getMelIndices(1600, N, 26);
         while (continueWorking && in.available() > 0)
         {
             //TODO actually process
@@ -141,6 +142,9 @@ public class ProcessVoiceActivity extends AppCompatActivity {
                 //https://dsp.stackexchange.com/questions/29165/speech-recognition-using-mfcc-and-dtwdynamic-time-warping
                 //http://www.fit.vutbr.cz/~grezl/ZRE/lectures/08_reco_dtw_en.pdf
                 //Use this?
+                float[] filterBanks = AudioAnalysis.melFilter(fourier, filterFreqIndexes);
+                AudioAnalysis.takeNaturalLog(filterBanks);
+                float[] melCoefficients = AudioAnalysis.dct(filterBanks, 13);
                 fourierView.updateFourierValues(fourier);
                 fourierView.updateDisplay();
             }

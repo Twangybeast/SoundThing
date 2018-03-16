@@ -68,7 +68,7 @@ public class Complex
 
     public float getMag()
     {
-        return (float) Math.hypot(a, b);
+        return (float) (a*a+ b*b);
     }
 
     @Override

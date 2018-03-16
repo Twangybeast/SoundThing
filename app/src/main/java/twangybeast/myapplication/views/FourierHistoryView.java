@@ -1,6 +1,7 @@
 package twangybeast.myapplication.views;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -19,9 +20,9 @@ import twangybeast.myapplication.util.HeatColor;
  */
 
 public class FourierHistoryView extends SurfaceView implements SurfaceHolder.Callback{
-    Queue<float[]> fourierHistory;
-    public static final int MAX_HISTORY = 20;
-
+    LinkedList<float[]> fourierHistory;
+    int added=0;
+    public static final int MAX_HISTORY = 10;
     public FourierHistoryView(Context context)
     {
         super(context);
@@ -77,6 +78,7 @@ public class FourierHistoryView extends SurfaceView implements SurfaceHolder.Cal
                 }
                 x++;
             }
+
         }
     }
     public void updateFourierValues(float[] fourier)
@@ -84,6 +86,7 @@ public class FourierHistoryView extends SurfaceView implements SurfaceHolder.Cal
         float[] newFourier;
         synchronized (fourierHistory)
         {
+            added++;
             if (fourierHistory.size() == MAX_HISTORY)
             {
                 newFourier = fourierHistory.poll();

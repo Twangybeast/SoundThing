@@ -8,6 +8,60 @@ import java.util.Arrays;
 
 public class AudioAnalysis
 {
+    public static float MAX_FREQ = 8000;
+    public static float MIN_FREQ = 80;
+    //https://github.com/Sciss/SpeechRecognitionHMM/blob/master/src/main/java/org/ioe/tprsa/audio/feature/MFCC.java
+    public static float[] dct(float[] origin, int resultCount)
+    {
+        float[] result = new float[resultCount];
+        for (int i = 0; i < result.length; i++) {
+            for (int j = 0; j < origin.length; j++) {
+                result[i] += origin[j] * Math.cos(Math.PI * i / origin.length * (j + 0.5));
+            }
+        }
+        return result;
+    }
+    public static void takeNaturalLog(float[] floats)
+    {
+        for (int i = 0; i < floats.length; i++) {
+            floats[i] = (float) Math.log(floats[i]);
+        }
+    }
+    public static float[] melFilter(float[] spectrum, int[] melIndices)
+    {
+        float[] result = new float[melIndices.length-2];
+        for (int m = 1; m < melIndices.length-1; m++) {
+            float sum = 0;
+            for (int i = melIndices[m-1]; i <= melIndices[m]; i++) {
+                sum += spectrum[i] * ((i - melIndices[m-1])/(melIndices[m] - melIndices[m-1]));
+            }
+            for (int i = melIndices[m]; i <= melIndices[m+1] ; i++) {
+                sum += spectrum[i] * ((melIndices[m+1] - i) /(melIndices[m+1] - melIndices[m]));
+            }
+            result[m-1] = sum;
+        }
+        return result;
+    }
+    public static int[] getMelIndices(int sampleFrequency, int N, int numFilters)
+    {
+        float lowMel = frequencyToMel(MIN_FREQ);
+        float highMel = frequencyToMel(MAX_FREQ);
+        int[] indexes = new int[numFilters + 2];
+        float melStep = (highMel - lowMel)/(numFilters + 1);
+        for (int i = 0; i < indexes.length; i++) {
+            float freq = melToFrequency(i*melStep + lowMel);
+            indexes[i] = Math.round(N * freq / sampleFrequency);//TODO Check if valid index
+        }
+        return indexes;
+    }
+    public static float frequencyToMel(float f)
+    {
+        return (float) (1125 * Math.log(1 + (f/700)));
+    }
+    public static float melToFrequency(float m)
+    {
+        return (float) (700 * (Math.exp(m/1125) - 1));
+    }
     public static float getMax(float[] floats)
     {
         float max = 0;
