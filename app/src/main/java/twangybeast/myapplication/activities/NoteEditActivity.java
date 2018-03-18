@@ -60,7 +60,7 @@ public class NoteEditActivity extends AppCompatActivity
             readFile(mNoteFile);
 
         }
-        mChanged = false;
+        mChanged = getIntent().getBooleanExtra(ProcessVoiceActivity.EXTRA_FROM_VOICE, false);
     }
     public static File getNewFile(File dir, String name, String suffix)
     {
