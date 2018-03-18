@@ -10,7 +10,9 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import java.util.LinkedList;
+import java.util.ListIterator;
 import java.util.Queue;
+import java.util.Random;
 
 import twangybeast.myapplication.soundAnalysis.Complex;
 import twangybeast.myapplication.util.HeatColor;
@@ -21,8 +23,11 @@ import twangybeast.myapplication.util.HeatColor;
 
 public class FourierHistoryView extends SurfaceView implements SurfaceHolder.Callback{
     LinkedList<float[]> fourierHistory;
-    int added=0;
-    public static final int MAX_HISTORY = 10;
+    private int added=0;
+    private int removed = 0;
+    public static final int MAX_HISTORY = 40;
+    private Bitmap lastBitmap;
+    private Bitmap cachedBitmap;
     public FourierHistoryView(Context context)
     {
         super(context);
@@ -52,7 +57,12 @@ public class FourierHistoryView extends SurfaceView implements SurfaceHolder.Cal
         Canvas canvas = getHolder().lockCanvas();
         if (canvas != null)
         {
-            drawAll(canvas);
+            Canvas drawingCanvas = new Canvas(cachedBitmap);
+            drawAll(drawingCanvas);
+            canvas.drawBitmap(cachedBitmap, 0, 0, new Paint());
+            Bitmap temp = lastBitmap;//Switches lastBitmap & cachedBitmap to reuse the same 2 bitmaps w/o reallocating memory each time
+            lastBitmap = cachedBitmap;
+            cachedBitmap = temp;
             getHolder().unlockCanvasAndPost(canvas);
         }
     }
@@ -62,23 +72,30 @@ public class FourierHistoryView extends SurfaceView implements SurfaceHolder.Cal
         Paint paint = new Paint();
         paint.setColor(0xFFFF0000);
         float width = getWidth();
-        int x = 0;
+        int x = fourierHistory.size() - added;
         float xStep = width/(MAX_HISTORY);
         float height = getHeight();
+        canvas.drawBitmap(lastBitmap, -(removed*xStep), 0, paint);
+        removed = 0;
         //TODO Efficient drawing
         synchronized (fourierHistory)
         {
-            for (float[] fourier: fourierHistory)
+            if (!fourierHistory.isEmpty())
             {
-                for (int y =0;y<height;y++)
+                ListIterator<float[]> iter = fourierHistory.listIterator(x);
+                while (iter.hasNext())
                 {
-                    int index = (int) ((y / height) * fourier.length);
-                    paint.setColor(HeatColor.interpolateColor(HeatColor.COLORS_HEATMAP_5, fourier[index]));
-                    canvas.drawLine((x*xStep), y, (x+1)*xStep, y, paint);
+                    float[] fourier = iter.next();
+                    for (int y = 0; y < height; y++)
+                    {
+                        int index = (int) ((y / height) * fourier.length);
+                        paint.setColor(HeatColor.interpolateColor(HeatColor.COLORS_HEATMAP_5, fourier[index]));
+                        canvas.drawLine((x * xStep), y, (x + 1) * xStep, y, paint);
+                    }
+                    x++;
                 }
-                x++;
             }
-
+            added = 0;
         }
     }
     public void updateFourierValues(float[] fourier)
@@ -91,6 +108,7 @@ public class FourierHistoryView extends SurfaceView implements SurfaceHolder.Cal
             {
                 newFourier = fourierHistory.poll();
                 System.arraycopy(fourier, 0, newFourier, 0, fourier.length);
+                removed++;
             }
             else
             {
@@ -102,6 +120,8 @@ public class FourierHistoryView extends SurfaceView implements SurfaceHolder.Cal
     }
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
+        lastBitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
+        cachedBitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
 
     }
 

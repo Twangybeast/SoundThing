@@ -1,6 +1,6 @@
 package twangybeast.myapplication.soundAnalysis;
 
-import java.util.Arrays;
+import android.arch.core.util.Function;
 
 /**
  * Created by cHeNdAn19 on 2/15/2018.
@@ -10,58 +10,78 @@ public class AudioAnalysis
 {
     public static float MAX_FREQ = 8000;
     public static float MIN_FREQ = 80;
+    public static void functionOnFloats(float[] floats, Function<Float, Float> function)
+    {
+        for (int i = 0; i < floats.length; i++)
+        {
+            floats[i] = function.apply(floats[i]);
+        }
+    }
     //https://github.com/Sciss/SpeechRecognitionHMM/blob/master/src/main/java/org/ioe/tprsa/audio/feature/MFCC.java
     public static float[] dct(float[] origin, int resultCount)
     {
         float[] result = new float[resultCount];
-        for (int i = 0; i < result.length; i++) {
-            for (int j = 0; j < origin.length; j++) {
+        for (int i = 0; i < result.length; i++)
+        {
+            for (int j = 0; j < origin.length; j++)
+            {
                 result[i] += origin[j] * Math.cos(Math.PI * i / origin.length * (j + 0.5));
             }
         }
         return result;
     }
+
     public static void takeNaturalLog(float[] floats)
     {
-        for (int i = 0; i < floats.length; i++) {
-            floats[i] = (float) Math.log(floats[i]);
+        for (int i = 0; i < floats.length; i++)
+        {
+            floats[i] = (float) Math.log(floats[i] + 1);
         }
     }
+
     public static float[] melFilter(float[] spectrum, int[] melIndices)
     {
-        float[] result = new float[melIndices.length-2];
-        for (int m = 1; m < melIndices.length-1; m++) {
+        float[] result = new float[melIndices.length - 2];
+        for (int m = 1; m < melIndices.length - 1; m++)
+        {
             float sum = 0;
-            for (int i = melIndices[m-1]; i <= melIndices[m]; i++) {
-                sum += spectrum[i] * ((i - melIndices[m-1])/(melIndices[m] - melIndices[m-1]));
+            for (int i = melIndices[m - 1]; i <= melIndices[m]; i++)
+            {
+                sum += spectrum[i] * ((i - melIndices[m - 1]) / (melIndices[m] - melIndices[m - 1]));
             }
-            for (int i = melIndices[m]; i <= melIndices[m+1] ; i++) {
-                sum += spectrum[i] * ((melIndices[m+1] - i) /(melIndices[m+1] - melIndices[m]));
+            for (int i = melIndices[m]; i <= melIndices[m + 1]; i++)
+            {
+                sum += spectrum[i] * ((melIndices[m + 1] - i) / (melIndices[m + 1] - melIndices[m]));
             }
-            result[m-1] = sum;
+            result[m - 1] = sum;
         }
         return result;
     }
+
     public static int[] getMelIndices(int sampleFrequency, int N, int numFilters)
     {
         float lowMel = frequencyToMel(MIN_FREQ);
         float highMel = frequencyToMel(MAX_FREQ);
         int[] indexes = new int[numFilters + 2];
-        float melStep = (highMel - lowMel)/(numFilters + 1);
-        for (int i = 0; i < indexes.length; i++) {
-            float freq = melToFrequency(i*melStep + lowMel);
+        float melStep = (highMel - lowMel) / (numFilters + 1);
+        for (int i = 0; i < indexes.length; i++)
+        {
+            float freq = melToFrequency(i * melStep + lowMel);
             indexes[i] = Math.round(N * freq / sampleFrequency);//TODO Check if valid index
         }
         return indexes;
     }
+
     public static float frequencyToMel(float f)
     {
-        return (float) (1125 * Math.log(1 + (f/700)));
+        return (float) (1125 * Math.log(1 + (f / 700)));
     }
+
     public static float melToFrequency(float m)
     {
-        return (float) (700 * (Math.exp(m/1125) - 1));
+        return (float) (700 * (Math.exp(m / 1125) - 1));
     }
+
     public static float getMax(float[] floats)
     {
         float max = 0;
@@ -71,12 +91,15 @@ public class AudioAnalysis
         }
         return max;
     }
+
     public static void complexToFloat(Complex[] complex, float[] target, int N)
     {
-        for (int i = 0; i < N; i++) {
+        for (int i = 0; i < N; i++)
+        {
             target[i] = complex[i].getMag();
         }
     }
+
     public static float[] toFloatArray(short[] in, float max, int N)
     {
         float[] out = new float[N];
@@ -86,12 +109,15 @@ public class AudioAnalysis
         }
         return out;
     }
+
     public static void toFloatArray(short[] src, float[] target, float max, int N)
     {
-        for (int i = 0; i < N; i++) {
+        for (int i = 0; i < N; i++)
+        {
             target[i] = (float) src[i] / max;
         }
     }
+
     public static void restrictFloatArray(float[] in, float max)
     {
         for (int i = 0; i < in.length; i++)
@@ -99,6 +125,7 @@ public class AudioAnalysis
             in[i] = in[i] / max;
         }
     }
+
     public static void restrictComplexArray(Complex[] in, float max)
     {
         for (int i = 0; i < in.length; i++)
@@ -106,6 +133,7 @@ public class AudioAnalysis
             in[i] = in[i].divide(max);
         }
     }
+
     public static void calculateFourier(float[] input, Complex[] data, int N)
     {
         for (int i = 0; i < N; i++)
@@ -165,6 +193,7 @@ public class AudioAnalysis
         }
         b = null;
     }
+
     public static void getRange(Complex[] in, Complex[] out, int i, int length)
     {
         System.arraycopy(in, i, out, 0, length);
