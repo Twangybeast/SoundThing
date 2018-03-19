@@ -3,6 +3,7 @@ package twangybeast.myapplication.activities;
 import android.app.Activity;
 import android.arch.core.util.Function;
 import android.content.Intent;
+import android.icu.text.AlphabeticIndex;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
@@ -94,14 +95,18 @@ public class ProcessVoiceActivity extends AppCompatActivity {
         byte[] buffer = new byte[bufferSize];
         File assetsDir = new Assets(this).syncAssets();
         Config config = Decoder.defaultConfig();
+        config.setFloat("-samprate", RecordSoundNoteActivity.SAMPLE_RATE);
+
         config.setString("-hmm", new File(assetsDir, "en-us-ptm").getPath());
-        config.setString("-lm", new File(assetsDir, "en-us.lm.dmp").getPath());
+        config.setString("-lm", new File(assetsDir, "en-us.lm.bin").getPath());
         config.setString("-dict", new File(assetsDir, "cmudict-en-us.dict").getPath());
+        config.setBoolean("-allphone_ci", true);
+
         Decoder decoder = new Decoder(config);
         decoder.startUtt();
         //Necessary method?
-        short[] header = SoundFileManager.convertBytesToShorts(SoundFileManager.getWavHeader((int)voiceFile.length(), 16000));
-        decoder.processRaw(header, header.length, false, false);
+        short[] header = SoundFileManager.convertBytesToShorts(SoundFileManager.getWavHeader((int)voiceFile.length(), RecordSoundNoteActivity.SAMPLE_RATE));
+        //decoder.processRaw(header, header.length, false, false);
 
         short[] shorts = new short[buffer.length/2];
         float[] floats = new float[shorts.length];

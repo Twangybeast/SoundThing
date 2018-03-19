@@ -23,7 +23,7 @@ public class RecordSoundNoteActivity extends AppCompatActivity
     File file;
     public static final String VOICE_FILE_NAME = "Voice Note ";
     public static final String VOICE_FILE_SUFFIX = ".pcm";
-    public static int SAMPLE_RATE = new int[]{16000, 44100}[0];
+    public static int SAMPLE_RATE = new int[]{16000, 8000}[0];
     public static int CHANNEL = AudioFormat.CHANNEL_CONFIGURATION_MONO;
     public static int ENCODING = AudioFormat.ENCODING_PCM_16BIT;
     public static final int MAX_AMPLITUDE = 1 << 15 - 1;
