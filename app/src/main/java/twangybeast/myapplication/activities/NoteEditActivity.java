@@ -3,6 +3,7 @@ package twangybeast.myapplication.activities;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -26,6 +27,10 @@ public class NoteEditActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note_edit);
+
+        setSupportActionBar((Toolbar) findViewById(R.id.toolbar3));
+        getSupportActionBar().setTitle(R.string.app_name);
+
 
         mNoteTitle = findViewById(R.id.editNoteTitle);
         mNoteBody = findViewById(R.id.editNoteBody);

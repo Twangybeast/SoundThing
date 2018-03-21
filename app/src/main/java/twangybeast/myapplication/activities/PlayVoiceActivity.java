@@ -7,6 +7,7 @@ import android.media.AudioManager;
 import android.media.AudioTrack;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.widget.ProgressBar;
 
 import java.io.DataInputStream;
@@ -32,6 +33,9 @@ public class PlayVoiceActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_play_voice);
+
+        setSupportActionBar((Toolbar) findViewById(R.id.toolbar2));
+        getSupportActionBar().setTitle(R.string.app_name);
 
         waveform = findViewById(R.id.waveViewPlay);
         voiceFile = new File(getIntent().getStringExtra(BrowseRecordingsActivity.EXTRA_VOICE_FILE));

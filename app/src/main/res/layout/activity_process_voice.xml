@@ -13,8 +13,8 @@
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent" android:layout_marginBottom="16dp"
-            app:layout_constraintBottom_toTopOf="@+id/progressBar3"/>
+            android:layout_marginBottom="16dp"
+            app:layout_constraintBottom_toTopOf="@+id/progressBar3" app:layout_constraintTop_toBottomOf="@+id/toolbar"/>
 
     <ProgressBar
         android:id="@+id/progressBar"
@@ -34,4 +34,11 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent" android:id="@+id/progressBar3"
             android:layout_marginBottom="16dp" app:layout_constraintBottom_toTopOf="@+id/progressBar"/>
+    <android.support.v7.widget.Toolbar
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            android:elevation="4dp"
+            android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light" android:id="@+id/toolbar"/>
 </android.support.constraint.ConstraintLayout>

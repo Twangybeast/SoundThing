@@ -7,6 +7,7 @@ import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Process;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -45,6 +46,10 @@ public class RecordSoundNoteActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_record_sound_note);
+
+        setSupportActionBar((Toolbar) findViewById(R.id.toolbar4));
+        getSupportActionBar().setTitle(R.string.app_name);
+
         isRecording = false;
         out = null;
         chooseSoundFile();
